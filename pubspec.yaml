@@ -1,0 +1,81 @@
+name: car_dealership
+description: A car dealership homepage.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.18.0
+  sliver_tools: ^0.2.5
+  function_helpers:
+    git: https://github.com/harlanx/function_helpers.git
+  smooth_page_indicator: ^1.0.0+2
+  collection: ^1.15.0
+  carousel_slider: ^4.2.1
+
+
+dev_dependencies:
+  flutter_lints: ^2.0.1
+  flutter_test:
+    sdk: flutter
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter.
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/fonts/
+    - assets/icons/
+    - assets/images/
+    - assets/images/highlights/
+
+  fonts:
+    - family: Lato
+      fonts:
+        - asset: assets/fonts/Lato-Light.ttf
+          weight: 200
+        - asset: assets/fonts/Lato-LightItalic.ttf
+          weight: 200
+          style: italic
+        - asset: assets/fonts/Lato-Thin.ttf
+          weight: 300
+        - asset: assets/fonts/Lato-ThinItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Lato-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Lato-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Lato-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Lato-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Lato-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Lato-BlackItalic.ttf
+          weight: 900
+          style: italic
+
+    - family: ZenAntiqueSoft
+      fonts:
+        - asset: assets/fonts/ZenAntiqueSoft-Regular.ttf
+          weight: 400
+    - family: ZenKakuGothicAntique
+      fonts: 
+        - asset: assets/fonts/ZenKakuGothicAntique-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/ZenKakuGothicAntique-Black.ttf
+          weight: 900
+        
