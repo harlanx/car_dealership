@@ -1,11 +1,11 @@
 {
-    "name": "Silvian Automobile PH",
-    "short_name": "Silvian",
+    "name": "car_dealership",
+    "short_name": "car_dealership",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "Leading automobile manufacturer and innovator in the Philippines.",
+    "description": "A new Flutter project.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
