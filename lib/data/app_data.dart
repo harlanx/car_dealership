@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:function_helpers/function_helpers.dart';
 
-export 'highlights.dart';
+export 'car_highlights.dart';
+export 'car_lineup.dart';
 
 class AppData {
   static String selectedLocale = 'en';

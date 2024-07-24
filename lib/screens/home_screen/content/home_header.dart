@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../data/app_data.dart';
-import '../../utilities/utilities.dart';
+import '../../../data/app_data.dart';
+import '../../../utilities/utilities.dart';
 
 final _leadingItems = <HomeHeaderItem>[
   HomeHeaderItem(
@@ -50,6 +50,7 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
   final _contentFocused = ValueNotifier<bool>(false);
 
   String _focusedItem = '';
+  bool menuSelected = false;
 
   @override
   void dispose() {
@@ -60,14 +61,19 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onExit: (_) {
+    return TapRegion(
+      onTapOutside: (event) {
         _menuCtrlr.reverse();
         _controller.reverse();
-        _contentFocused.value = false;
       },
-      child: Container(
-        color: Colors.black,
+      child: MouseRegion(
+        onExit: (_) {
+          if (!menuSelected) {
+            _menuCtrlr.reverse();
+            _contentFocused.value = false;
+            _controller.reverse();
+          }
+        },
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
@@ -75,6 +81,7 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
             Container(
               height: 80,
               decoration: BoxDecoration(
+                color: Colors.black,
                 border: Border(
                   bottom: BorderSide(
                     color: AppData.color,
@@ -141,23 +148,34 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0),
-                                  child: IconButton(
-                                    icon: AnimatedIcon(
-                                      icon: AnimatedIcons.menu_close,
-                                      progress: _menuAnim,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal:
+                                        constraints.maxWidth >= 1020 ? 20 : 5.0,
+                                  ),
+                                  child: Center(
+                                    child: IconButton(
+                                      icon: AnimatedIcon(
+                                        icon: AnimatedIcons.menu_close,
+                                        progress: _menuAnim,
+                                      ),
+                                      onPressed: () {
+                                        if (_menuCtrlr.status ==
+                                            AnimationStatus.dismissed) {
+                                          setState(() {
+                                            menuSelected = true;
+                                          });
+                                          _menuCtrlr.forward();
+                                          _controller.forward();
+                                        } else {
+                                          _menuCtrlr.reverse();
+                                          _controller
+                                              .reverse()
+                                              .then((value) => setState(() {
+                                                    menuSelected = false;
+                                                  }));
+                                        }
+                                      },
                                     ),
-                                    onPressed: () {
-                                      if (_menuCtrlr.status ==
-                                          AnimationStatus.dismissed) {
-                                        _menuCtrlr.forward();
-                                        _controller.forward();
-                                      } else {
-                                        _menuCtrlr.reverse();
-                                        _controller.reverse();
-                                      }
-                                    },
                                   ),
                                 ),
                               ],
@@ -174,6 +192,16 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
               animation: _animation,
               focusedItem: _focusedItem,
               items: _leadingItems,
+              menuSelected: menuSelected,
+              menuItem: Column(
+                children: [
+                  for (var color in Colors.primaries)
+                    Container(
+                      color: color,
+                      height: RandomHelper.randRangeDouble(5, 20),
+                    ),
+                ],
+              ),
             ),
           ],
         ),
@@ -182,13 +210,13 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
   }
 
   Widget _headerItemBox(HomeHeaderItem item, BuildContext context) {
-    final Size size = (TextPainter(
+    final size = (TextPainter(
             text: TextSpan(
               text: item.key.toUpperCase(),
               style: const TextStyle(fontSize: 15),
             ),
             maxLines: 1,
-            textScaleFactor: MediaQuery.of(context).textScaleFactor,
+            textScaler: MediaQuery.of(context).textScaler,
             textDirection: TextDirection.ltr)
           ..layout())
         .size;
@@ -198,14 +226,19 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
         cursor: SystemMouseCursors.click,
         onEnter: (_) {
           setState(() {
+            if (item.hasContent) {
+              menuSelected = false;
+              _menuCtrlr.reverse();
+            }
             _focusedItem = item.key;
           });
-          _menuCtrlr.reverse();
           _contentFocused.value = true;
-          if (item.hasContent) {
-            _controller.forward();
-          } else {
-            _controller.reverse();
+          if (!menuSelected) {
+            if (item.hasContent) {
+              _controller.forward();
+            } else {
+              _controller.reverse();
+            }
           }
         },
         child: Column(
@@ -284,7 +317,7 @@ class HomeHeaderItemContent {
     600,
     700,
     800,
-    900
+    900,
   ];
 
   Widget get contentChild {
@@ -294,10 +327,10 @@ class HomeHeaderItemContent {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (var i in _colorShades.reversed)
+          for (var shade in _colorShades.reversed)
             Container(
-              color: color[i],
-              height: 20,
+              color: color[shade],
+              height: RandomHelper.randRangeDouble(5, 50),
             ),
         ],
       );
@@ -308,14 +341,18 @@ class HomeHeaderItemContent {
 class HomeHeaderContentBox extends StatefulWidget {
   const HomeHeaderContentBox({
     Key? key,
-    required this.items,
-    required this.focusedItem,
     required this.animation,
+    required this.focusedItem,
+    required this.items,
+    required this.menuItem,
+    required this.menuSelected,
   }) : super(key: key);
 
   final Animation<double> animation;
   final String focusedItem;
   final List<HomeHeaderItem> items;
+  final Widget menuItem;
+  final bool menuSelected;
 
   @override
   State<HomeHeaderContentBox> createState() => _HomeHeaderContentBoxState();
@@ -339,14 +376,10 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox> {
   }
 
   List<Widget> get _itemChildren {
-    final List<Widget> children = [];
-    for (var e in widget.items) {
-      if (e.hasContent) {
-        children.add(e.content!.contentChild);
-      }
-    }
-
-    return children;
+    return [
+      for (var item in widget.items)
+        if (item.hasContent) item.content!.contentChild
+    ];
   }
 
   @override
@@ -354,9 +387,15 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox> {
     return SizeTransition(
         sizeFactor: widget.animation,
         axis: Axis.vertical,
-        child: IndexedStack(
-          index: _focusedIndex,
-          children: _itemChildren,
-        ));
+        child: Builder(builder: (context) {
+          if (widget.menuSelected) {
+            return widget.menuItem;
+          }
+          return IndexedStack(
+            sizing: StackFit.loose,
+            index: _focusedIndex,
+            children: _itemChildren,
+          );
+        }));
   }
 }

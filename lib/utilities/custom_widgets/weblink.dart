@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -47,9 +45,7 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
               TextSpan(
                 text: widget.text,
                 style: TextStyle(color: _animation.value),
-                recognizer: !widget.onTap.isNull
-                    ? (TapGestureRecognizer()..onTap = widget.onTap)
-                    : null,
+                recognizer: (TapGestureRecognizer()..onTap = widget.onTap),
               ),
             );
           }),

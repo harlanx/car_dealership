@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../../data/app_data.dart';
-import '../../utilities/utilities.dart';
+import '../../../data/app_data.dart';
+import '../../../utilities/utilities.dart';
 
-class HomeExtra extends StatefulWidget {
-  const HomeExtra({Key? key}) : super(key: key);
+class HomePinnedExtra extends StatefulWidget {
+  const HomePinnedExtra({Key? key}) : super(key: key);
 
   @override
-  State<HomeExtra> createState() => _HomeExtraState();
+  State<HomePinnedExtra> createState() => _HomePinnedExtraState();
 }
 
-class _HomeExtraState extends State<HomeExtra> {
+class _HomePinnedExtraState extends State<HomePinnedExtra> {
   var isFocused = List<bool>.filled(5, false);
   final _divider = const SizedBox(
     height: 15,

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-import '../../data/app_data.dart';
-import '../../models/car.dart';
-import '../../utilities/utilities.dart';
+import '../../../data/app_data.dart';
+import '../../../models/car.dart';
+import '../../../utilities/utilities.dart';
 
 class HomeHighlight extends StatefulWidget {
   const HomeHighlight({Key? key, required this.size}) : super(key: key);
@@ -24,7 +24,7 @@ class _HomeHighlightState extends State<HomeHighlight>
     double val = 5 / 2;
     if (sWidth > 1280) {
       val = 5 / 2;
-    } else if (sWidth > 600 && sWidth < 1280) {
+    } else if (sWidth > 1000 && sWidth < 1280) {
       val = 3 / 2;
     } else {
       val = 2.5 / 2;
@@ -35,103 +35,113 @@ class _HomeHighlightState extends State<HomeHighlight>
 
   bool get _screenLarge {
     final sWidth = widget.size.width;
-    return sWidth >= 600;
+    return sWidth >= 1280;
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      child: AspectRatio(
-        aspectRatio: _aRatio,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CarouselSlider(
-              carouselController: _carouselController,
-              options: CarouselOptions(
-                initialPage: 2,
-                scrollDirection: Axis.horizontal,
-                autoPlay: true,
-                enableInfiniteScroll: true,
-                viewportFraction: 1.0,
-                aspectRatio: _aRatio,
-                autoPlayCurve: Curves.easeInOutCubic,
-                autoPlayInterval: const Duration(seconds: 5),
-                autoPlayAnimationDuration: const Duration(seconds: 1),
-              ),
-              items: [
-                for (var car in carHighlights)
-                  CarHighlightBox(
-                    carouselController: _carouselController,
-                    car: car,
-                    screenLarge: _screenLarge,
-                  )
+    return AspectRatio(
+      aspectRatio: _aRatio,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          CarouselSlider(
+            carouselController: _carouselController,
+            options: CarouselOptions(
+              initialPage: 2,
+              scrollDirection: Axis.horizontal,
+              scrollPhysics: _screenLarge
+                  ? const NeverScrollableScrollPhysics()
+                  : const ScrollPhysics(),
+              autoPlay: true,
+              enableInfiniteScroll: true,
+              viewportFraction: 1.0,
+              aspectRatio: _aRatio,
+              autoPlayCurve: Curves.easeInOutCubic,
+              autoPlayInterval: const Duration(seconds: 5),
+              autoPlayAnimationDuration: const Duration(seconds: 1),
+            ),
+            items: [
+              for (var car in carHighlights)
+                CarHighlightBox(
+                  carouselController: _carouselController,
+                  car: car,
+                  screenLarge: _screenLarge,
+                )
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                PolyButton(
+                  onPressed: () {
+                    _carouselController.previousPage(
+                      curve: Curves.easeInOutCubic,
+                      duration: const Duration(seconds: 1),
+                    );
+                  },
+                  style: PolyButtonStyle(
+                    borderColor: AppData.color,
+                    endChildColor: Colors.white,
+                    endColor: AppData.color,
+                    size: 60,
+                  ),
+                  child: const Icon(Icons.arrow_back_ios_sharp),
+                ),
+                PolyButton(
+                  onPressed: () {
+                    _carouselController.nextPage(
+                      curve: Curves.easeInOutCubic,
+                      duration: const Duration(seconds: 1),
+                    );
+                  },
+                  style: PolyButtonStyle(
+                    borderColor: AppData.color,
+                    endChildColor: Colors.white,
+                    endColor: AppData.color,
+                    size: 60,
+                  ),
+                  child: const Icon(Icons.arrow_forward_ios_sharp),
+                ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  PolyButton(
-                    onPressed: () {
-                      _carouselController.previousPage();
-                    },
-                    style: PolyButtonStyle(
-                      borderColor: AppData.color,
-                      endChildColor: Colors.white,
-                      endColor: AppData.color,
-                      size: 60,
-                    ),
-                    child: const Icon(Icons.arrow_back_ios_sharp),
-                  ),
-                  PolyButton(
-                    onPressed: () {
-                      _carouselController.nextPage();
-                    },
-                    style: PolyButtonStyle(
-                      borderColor: AppData.color,
-                      endChildColor: Colors.white,
-                      endColor: AppData.color,
-                      size: 60,
-                    ),
-                    child: const Icon(Icons.arrow_forward_ios_sharp),
-                  ),
-                ],
-              ),
-            ),
-            FutureBuilder(
-              future: _carouselController.onReady,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 10.0),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SmoothPageIndicator(
-                        controller: _carouselController.state!.pageController!,
-                        count: _carouselController.state!.itemCount!,
-                        onDotClicked: (val) {
-                          _carouselController.animateToPage(val - 1);
-                        },
-                        effect: SlideEffect(
-                          activeDotColor: AppData.color,
-                          paintStyle: PaintingStyle.stroke,
-                          spacing: 10,
-                          dotWidth: 20,
-                          dotColor: Colors.white,
-                          strokeWidth: 2,
-                        ),
+          ),
+          FutureBuilder(
+            future: _carouselController.onReady,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: _screenLarge ? 10.0 : 2.0),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: SmoothPageIndicator(
+                      controller: _carouselController.state!.pageController!,
+                      count: _carouselController.state!.itemCount!,
+                      onDotClicked: (val) {
+                        _carouselController.animateToPage(
+                          val - 1,
+                          curve: Curves.easeInOutCubic,
+                          duration: const Duration(seconds: 1),
+                        );
+                      },
+                      effect: SlideEffect(
+                        activeDotColor: AppData.color,
+                        paintStyle: PaintingStyle.stroke,
+                        dotHeight: _screenLarge ? 16 : 15,
+                        dotWidth: _screenLarge ? 20 : 15,
+                        dotColor: Colors.white,
+                        strokeWidth: _screenLarge ? 2 : 1.5,
                       ),
                     ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
-        ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
     );
   }
@@ -146,7 +156,7 @@ class CarHighlightBox extends StatefulWidget {
   }) : super(key: key);
 
   final CarouselController carouselController;
-  final CarHighlight car;
+  final CarProduct car;
   final bool screenLarge;
 
   @override
@@ -249,6 +259,7 @@ class _CarHighlightBoxState extends State<CarHighlightBox>
                           fontFamily: 'ZenKakuGothicAntique',
                           fontSize: 90,
                           fontWeight: FontWeight.w900,
+                          height: 0.8,
                           color: Colors.white,
                         ),
                       ),
@@ -258,6 +269,75 @@ class _CarHighlightBoxState extends State<CarHighlightBox>
               ),
             ),
           ),
+          if (widget.screenLarge) ...[
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: widget.screenLarge ? 50 : 20,
+                  left: 60,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PolyButton(
+                      onPressed: () {},
+                      style: PolyButtonStyle(
+                        borderColor: AppData.color,
+                        borderSize: 1.5,
+                        endChildColor: Colors.white,
+                        endColor: AppData.color,
+                        size: 40,
+                      ),
+                      child: const Icon(Icons.add),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        'Explore the model',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ] else ...[
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: widget.screenLarge ? 50 : 20, right: 10),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    PolyButton(
+                      onPressed: () {},
+                      style: PolyButtonStyle(
+                        borderColor: AppData.color,
+                        borderSize: 1.5,
+                        endChildColor: Colors.white,
+                        endColor: AppData.color,
+                        size: 40,
+                      ),
+                      child: const Icon(Icons.add),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        'Explore the model',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
           Align(
             alignment: Alignment.bottomRight,
             child: Padding(

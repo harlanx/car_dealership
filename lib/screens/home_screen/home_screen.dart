@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:sliver_tools/sliver_tools.dart';
 
-import '../../screens/home_screen/home_header.dart';
-import '../../screens/home_screen/home_highlight.dart';
-import 'home_extra.dart';
+import 'content/home_pinned_extra.dart';
+import 'content/home_header.dart';
+import 'content/home_highlight.dart';
+import 'content/home_lineup.dart';
+import 'content/home_news.dart';
+import 'content/home_bottom_info.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -17,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         controller: _scHeader,
         shrinkWrap: true,
         slivers: [
-          const HomeExtra(),
+          const HomePinnedExtra(),
           SliverStack(
             insetOnOverlap: true,
             children: [
@@ -28,6 +31,8 @@ class HomeScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       HomeHighlight(size: MediaQuery.of(context).size),
+                      HomeLineup(size: MediaQuery.of(context).size),
+                      // TODO: Do This other contents
                       for (var i in Colors.primaries)
                         Center(
                           child: Container(
@@ -36,13 +41,13 @@ class HomeScreen extends StatelessWidget {
                             height: 200,
                           ),
                         ),
+                      const HomeNews(),
+                      const HomeBottomInfo(),
                     ],
                   ),
                 ),
               ),
-              const SliverPinnedHeader(
-                child: HomeHeader(),
-              ),
+              const SliverPinnedHeader(child: HomeHeader()),
             ],
           ),
         ],
