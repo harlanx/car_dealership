@@ -1,8 +1,8 @@
-import 'package:collection/collection.dart';
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
 import '../../../data/app_data.dart';
@@ -84,7 +84,7 @@ class _HomeLineupState extends State<HomeLineup>
       children: [
         Container(
           padding: const EdgeInsets.all(10.0),
-          height: 400,
+          height: _screenLarge ? 400 : 250,
           width: double.infinity,
           child: Stack(
             fit: StackFit.expand,
@@ -115,6 +115,7 @@ class _HomeLineupState extends State<HomeLineup>
                       index: index,
                       currentIndex: _currentIndex,
                       enabled: _isInVicinity(index),
+                      screenLarge: _screenLarge,
                     ),
                   ),
                 ),
@@ -191,11 +192,13 @@ class CarLineup extends StatefulWidget {
     required this.index,
     required this.currentIndex,
     required this.enabled,
+    required this.screenLarge,
   });
 
   final int index;
   final int currentIndex;
   final bool enabled;
+  final bool screenLarge;
 
   @override
   State<CarLineup> createState() => _CarLineupState();
@@ -204,7 +207,7 @@ class CarLineup extends StatefulWidget {
 class _CarLineupState extends State<CarLineup>
     with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 150));
+      vsync: this, duration: const Duration(milliseconds: 300));
   late final Animation<Color?> _animation =
       ColorTween(begin: Colors.black, end: Colors.white).animate(_controller);
 
@@ -222,74 +225,68 @@ class _CarLineupState extends State<CarLineup>
       key: ValueKey(car),
       cursor: SystemMouseCursors.click,
       onEnter: (e) {
-        if (widget.enabled) _controller.forward();
+        if (widget.enabled && widget.screenLarge) _controller.forward();
       },
       onExit: (e) {
-        if (widget.enabled) _controller.reverse();
+        if (widget.enabled && widget.screenLarge) _controller.reverse();
       },
       child: Opacity(
         opacity: widget.enabled ? 1 : 0.5,
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background
-            Animate(
-              controller: _controller,
-              autoPlay: false,
-              effects: const [
-                SlideEffect(
-                  begin: Offset(0, 1),
-                  end: Offset.zero,
-                  duration: Duration(milliseconds: 150),
-                  curve: Curves.fastOutSlowIn,
-                ),
-                FadeEffect(
-                  duration: Duration(milliseconds: 150),
-                  curve: Curves.fastOutSlowIn,
-                ),
-              ],
-              child: Center(
-                child: SizedBox(
-                  width: 320,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    fit: StackFit.expand,
-                    children: [
-                      // Car Background
-                      Image.asset(
-                        car.preview[1],
-                        fit: BoxFit.cover,
-                      ),
-                      // Black Gradient
-                      Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0x00000000),
-                              Color(0xff000000),
-                            ],
+            AnimatedBuilder(
+              animation:
+                  _controller.drive(CurveTween(curve: Curves.easeInSine)),
+              builder: (context, _) {
+                return ClipPath(
+                  clipper: AngledClipper(_controller.value),
+                  child: Center(
+                    child: SizedBox(
+                      width: 320,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        fit: StackFit.expand,
+                        children: [
+                          // Car Background
+                          Image.asset(
+                            car.preview[1],
+                            fit: BoxFit.cover,
                           ),
-                        ),
+                          // Black Gradient
+                          Container(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Color(0x00000000),
+                                  Color(0xff000000),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             ),
-            Align(
-              alignment: const Alignment(0, -0.3),
+            Center(
               child: Image.asset(
                 car.preview.first,
                 height: double.infinity,
+                alignment: Alignment(0, widget.screenLarge ? -0.2 : -0.7),
                 fit: BoxFit.fitWidth,
               ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 10.0),
+                padding: EdgeInsets.only(
+                  bottom: widget.screenLarge ? 30 : 20.0,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -325,4 +322,29 @@ class _CarLineupState extends State<CarLineup>
       ),
     );
   }
+}
+
+class AngledClipper extends CustomClipper<Path> {
+  AngledClipper(this.progress, {this.angle = 180});
+  double progress;
+  int angle;
+
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    final path = Path();
+    final radian = angle * pi / 180;
+
+    path.moveTo(0, h);
+    path.lineTo(w, h);
+    path.lineTo(w, h * (1 - progress));
+    path.lineTo(0, (h * (1 - progress) - (h * radian) * progress).clamp(0, h));
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(covariant CustomClipper oldClipper) => true;
 }
