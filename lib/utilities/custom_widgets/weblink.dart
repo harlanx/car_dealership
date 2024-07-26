@@ -6,10 +6,12 @@ class WebLink extends StatefulWidget {
     Key? key,
     required this.text,
     this.hoverColor = Colors.black,
+    this.underline = false,
     this.onTap,
   }) : super(key: key);
   final String text;
   final Color hoverColor;
+  final bool underline;
   final VoidCallback? onTap;
   @override
   State<WebLink> createState() => _WebLinkState();
@@ -44,7 +46,12 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
             return SelectableText.rich(
               TextSpan(
                 text: widget.text,
-                style: TextStyle(color: _animation.value),
+                style: TextStyle(
+                  color: _animation.value,
+                  decoration: widget.underline
+                      ? TextDecoration.underline
+                      : TextDecoration.none,
+                ),
                 recognizer: (TapGestureRecognizer()..onTap = widget.onTap),
               ),
             );
