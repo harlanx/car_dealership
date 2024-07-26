@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 
 class PolyButton extends StatefulWidget {
   const PolyButton({
-    Key? key,
+    super.key,
     required this.child,
     this.onPressed,
     this.style = const PolyButtonStyle(),
-  }) : super(key: key);
+  });
   final Widget child;
   final VoidCallback? onPressed;
   final PolyButtonStyle style;

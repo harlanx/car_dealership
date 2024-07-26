@@ -23,7 +23,7 @@ final _trailingItems = <HomeHeaderItem>[
 ];
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({Key? key}) : super(key: key);
+  const HomeHeader({super.key});
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
 }
@@ -340,13 +340,13 @@ class HomeHeaderItemContent {
 
 class HomeHeaderContentBox extends StatefulWidget {
   const HomeHeaderContentBox({
-    Key? key,
+    super.key,
     required this.animation,
     required this.focusedItem,
     required this.items,
     required this.menuItem,
     required this.menuSelected,
-  }) : super(key: key);
+  });
 
   final Animation<double> animation;
   final String focusedItem;

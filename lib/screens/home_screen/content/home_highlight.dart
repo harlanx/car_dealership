@@ -8,7 +8,7 @@ import '../../../models/car.dart';
 import '../../../utilities/utilities.dart';
 
 class HomeHighlight extends StatefulWidget {
-  const HomeHighlight({Key? key, required this.size}) : super(key: key);
+  const HomeHighlight({super.key, required this.size});
   final Size size;
 
   @override
@@ -149,11 +149,11 @@ class _HomeHighlightState extends State<HomeHighlight>
 
 class CarHighlightBox extends StatefulWidget {
   const CarHighlightBox({
-    Key? key,
+    super.key,
     required this.carouselController,
     required this.car,
     required this.screenLarge,
-  }) : super(key: key);
+  });
 
   final CarouselController carouselController;
   final CarProduct car;

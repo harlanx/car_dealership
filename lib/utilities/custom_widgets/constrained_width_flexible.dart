@@ -8,14 +8,13 @@ class ConstrainedWidthFlexible extends StatelessWidget {
   final Widget child;
   final BoxConstraints outerConstraints;
   const ConstrainedWidthFlexible(
-      {Key? key,
+      {super.key,
       required this.minWidth,
       required this.maxWidth,
       required this.flex,
       required this.flexSum,
       required this.outerConstraints,
-      required this.child})
-      : super(key: key);
+      required this.child});
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(

@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 class WebLink extends StatefulWidget {
   const WebLink({
-    Key? key,
+    super.key,
     required this.text,
     this.hoverColor = Colors.black,
     this.underline = false,
     this.onTap,
-  }) : super(key: key);
+  });
   final String text;
   final Color hoverColor;
   final bool underline;

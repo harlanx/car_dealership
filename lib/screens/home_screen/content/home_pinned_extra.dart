@@ -4,7 +4,7 @@ import '../../../data/app_data.dart';
 import '../../../utilities/utilities.dart';
 
 class HomePinnedExtra extends StatefulWidget {
-  const HomePinnedExtra({Key? key}) : super(key: key);
+  const HomePinnedExtra({super.key});
 
   @override
   State<HomePinnedExtra> createState() => _HomePinnedExtraState();

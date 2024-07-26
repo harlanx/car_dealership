@@ -5,7 +5,7 @@ import '../../data/app_data.dart';
 import '../extensions.dart';
 
 class LanguageOptionTray extends StatefulWidget {
-  const LanguageOptionTray({Key? key}) : super(key: key);
+  const LanguageOptionTray({super.key});
 
   @override
   State<LanguageOptionTray> createState() => _LanguageOptionTrayState();

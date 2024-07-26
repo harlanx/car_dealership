@@ -10,7 +10,7 @@ import 'content/home_news.dart';
 import 'content/home_bottom_info.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({super.key});
   final ScrollController _scHeader = ScrollController();
 
   @override
@@ -32,16 +32,7 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       HomeHighlight(size: MediaQuery.of(context).size),
                       HomeLineup(size: MediaQuery.of(context).size),
-                      // TODO: Do This other contents
-                      for (var i in Colors.primaries)
-                        Center(
-                          child: Container(
-                            color: i,
-                            constraints: const BoxConstraints(maxWidth: 1280),
-                            height: 200,
-                          ),
-                        ),
-                      const HomeNews(),
+                      HomeNews(size: MediaQuery.of(context).size),
                       const HomeBottomInfo(),
                     ],
                   ),
