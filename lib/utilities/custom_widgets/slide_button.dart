@@ -73,6 +73,7 @@ class _SlideButtonState extends State<SlideButton>
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
+      cursor: SystemMouseCursors.click,
       onEnter: (_) {
         _controller.forward();
       },
