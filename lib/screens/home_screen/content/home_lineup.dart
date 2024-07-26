@@ -184,6 +184,8 @@ class _HomeLineupState extends State<HomeLineup>
           child: Wrap(
             direction: Axis.horizontal,
             alignment: WrapAlignment.center,
+            runAlignment: WrapAlignment.center,
+            spacing: 20,
             children: [
               SlideButton(
                 label: 'EXPLORE OUR LINEUP',
@@ -197,7 +199,6 @@ class _HomeLineupState extends State<HomeLineup>
                 ),
                 onPressed: () {},
               ),
-              const SizedBox(width: 20),
               SlideButton(
                 label: 'GET A QUOTE',
                 style: const TextStyle(
@@ -206,7 +207,6 @@ class _HomeLineupState extends State<HomeLineup>
                 ),
                 onPressed: () {},
               ),
-              const SizedBox(width: 20),
               DefaultTextStyle(
                 style: const TextStyle(
                     color: Colors.black,
