@@ -179,8 +179,54 @@ class _HomeLineupState extends State<HomeLineup>
             ],
           ),
         ),
-        //TODO: Add Explore our lineup, get a quote, check out price list
-        Row(),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 30.0),
+          child: Wrap(
+            direction: Axis.horizontal,
+            alignment: WrapAlignment.center,
+            children: [
+              SlideButton(
+                label: 'EXPLORE OUR LINEUP',
+                labelColor: Colors.white,
+                bgColor: Colors.black,
+                fgColor: AppData.color,
+                borderColor: Colors.black,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                onPressed: () {},
+              ),
+              const SizedBox(width: 20),
+              SlideButton(
+                label: 'GET A QUOTE',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                onPressed: () {},
+              ),
+              const SizedBox(width: 20),
+              DefaultTextStyle(
+                style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w900),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 15,
+                  ),
+                  child: WebLink(
+                    text: 'CHECK OUR PRICELIST ➜',
+                    hoverColor: AppData.color,
+                    underline: true,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -325,7 +371,7 @@ class _CarLineupState extends State<CarLineup>
 }
 
 class AngledClipper extends CustomClipper<Path> {
-  AngledClipper(this.progress, {this.angle = 180});
+  AngledClipper(this.progress, {this.angle = 60});
   double progress;
   int angle;
 

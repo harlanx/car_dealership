@@ -4,3 +4,4 @@ export 'language_option.dart';
 export 'poly_button.dart';
 export 'web_scroll_behavior.dart';
 export 'weblink.dart';
+export 'slide_button.dart';

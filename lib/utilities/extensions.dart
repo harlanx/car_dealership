@@ -45,3 +45,18 @@ extension LocaleExtension on Locale {
         (match) => String.fromCharCode(match.group(0)!.codeUnitAt(0) + 127397));
   }
 }
+
+extension StringEx on String {
+  Size textSize({
+    required TextStyle? style,
+    int maxLines = 1,
+    double maxWidth = double.infinity,
+  }) {
+    final TextPainter textPainter = TextPainter(
+        text: TextSpan(text: this, style: style),
+        maxLines: maxLines,
+        textDirection: TextDirection.ltr)
+      ..layout(minWidth: 0, maxWidth: maxWidth);
+    return textPainter.size;
+  }
+}
