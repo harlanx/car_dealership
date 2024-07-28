@@ -5,11 +5,13 @@ class WebLink extends StatefulWidget {
   const WebLink({
     super.key,
     required this.text,
+    this.color,
     this.hoverColor = Colors.black,
     this.underline = false,
     this.onTap,
   });
   final String text;
+  final Color? color;
   final Color hoverColor;
   final bool underline;
   final VoidCallback? onTap;
@@ -21,7 +23,7 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 150));
   late final Animation<Color?> _animation = ColorTween(
-          begin: DefaultTextStyle.of(context).style.color,
+          begin: widget.color ?? DefaultTextStyle.of(context).style.color,
           end: widget.hoverColor)
       .animate(_controller);
 
@@ -51,6 +53,7 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
                   decoration: widget.underline
                       ? TextDecoration.underline
                       : TextDecoration.none,
+                  decorationColor: _animation.value,
                 ),
                 recognizer: (TapGestureRecognizer()..onTap = widget.onTap),
               ),
