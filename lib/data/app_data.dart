@@ -3,6 +3,7 @@ import 'package:function_helpers/function_helpers.dart';
 
 export 'car_highlights.dart';
 export 'car_lineup.dart';
+export 'news_headlines.dart';
 
 class AppData {
   static String selectedLocale = 'en';

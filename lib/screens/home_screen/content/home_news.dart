@@ -1,31 +1,197 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../data/app_data.dart';
+import '../../../models/models.dart';
+import '../../../utilities/utilities.dart';
 
 class HomeNews extends StatefulWidget {
-  const HomeNews({super.key});
+  const HomeNews({
+    super.key,
+    required this.size,
+  });
+
+  final Size size;
 
   @override
   State<HomeNews> createState() => _HomeNewsState();
 }
 
 class _HomeNewsState extends State<HomeNews> {
+  bool get _screenLarge {
+    final sWidth = widget.size.width;
+    return sWidth >= 1280;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 500,
       width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.symmetric(
           horizontal: BorderSide(
             color: AppData.color,
-            width: 5.0,
+            width: 2.0,
           ),
         ),
       ),
-      child: const Center(
-        child: FlutterLogo(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text(
+            'NEWSROOM',
+            style: TextStyle(
+              fontSize: 50,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          MasonryGridView.count(
+            itemCount: newsHeadlines.length,
+            crossAxisSpacing: 10,
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(8),
+            crossAxisCount: _screenLarge ? 3 : 2,
+            scrollDirection: Axis.vertical,
+            mainAxisSpacing: 10,
+            itemBuilder: (context, index) {
+              return NewsBox(news: newsHeadlines[index]);
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NewsBox extends StatefulWidget {
+  const NewsBox({
+    super.key,
+    required this.news,
+  });
+  final News news;
+
+  @override
+  State<NewsBox> createState() => _NewsBoxState();
+}
+
+class _NewsBoxState extends State<NewsBox> with SingleTickerProviderStateMixin {
+  late final _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 150),
+  );
+
+  late final _backgroundColor = ColorTween(
+    begin: Colors.white,
+    end: Colors.black,
+  ).animate(_controller);
+
+  late final _textColor = ColorTween(
+    begin: Colors.black,
+    end: Colors.white,
+  ).animate(_controller);
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (event) {
+        _controller.forward();
+      },
+      onExit: (event) {
+        _controller.reverse();
+      },
+      child: GestureDetector(
+        onTap: () {},
+        child: AnimatedBuilder(
+            animation: _backgroundColor,
+            builder: (context, _) {
+              return Container(
+                decoration: BoxDecoration(
+                    color: _backgroundColor.value,
+                    border: Border.all(
+                      color: _backgroundColor.value!,
+                      width: 2.0,
+                    )),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.news.image != null) ...[
+                      Image.asset(widget.news.image!)
+                    ],
+                    Flexible(
+                      child: AnimatedBuilder(
+                        animation: _textColor,
+                        builder: (context, _) {
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 10,
+                                  ),
+                                  child: Text(
+                                    widget.news.headline,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      color: _textColor.value,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Flexible(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                  ),
+                                  child: Text(
+                                    widget.news.description,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 2,
+                                    style: TextStyle(
+                                      color: _textColor.value,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: WebLink(
+                          text: 'Read More >>',
+                          color: AppData.color,
+                          hoverColor: AppData.color,
+                          underline: true,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
       ),
     );
   }
