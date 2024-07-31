@@ -29,8 +29,8 @@ class _HomePinnedExtraState extends State<HomePinnedExtra> {
       toolbarHeight: 40,
       backgroundColor: AppData.colorSwatch,
       centerTitle: true,
-      shape: Border(
-        bottom: BorderSide(color: AppData.colorSwatch.shade300, width: 1),
+      shape: const Border(
+        bottom: BorderSide(color: Colors.white, width: 2.0),
       ),
       title: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: AppData.maxWidthConstraints),
