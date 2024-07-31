@@ -33,7 +33,7 @@ class HomeScreen extends StatelessWidget {
                       HomeHighlight(size: MediaQuery.of(context).size),
                       HomeLineup(size: MediaQuery.of(context).size),
                       HomeNews(size: MediaQuery.of(context).size),
-                      const HomeBottomInfo(),
+                      HomeBottomInfo(size: MediaQuery.of(context).size),
                     ],
                   ),
                 ),

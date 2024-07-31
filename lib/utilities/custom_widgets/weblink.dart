@@ -8,12 +8,14 @@ class WebLink extends StatefulWidget {
     this.color,
     this.hoverColor = Colors.black,
     this.underline = false,
+    this.underlineHover = false,
     this.onTap,
   });
   final String text;
   final Color? color;
   final Color hoverColor;
   final bool underline;
+  final bool underlineHover;
   final VoidCallback? onTap;
   @override
   State<WebLink> createState() => _WebLinkState();
@@ -26,6 +28,7 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
           begin: widget.color ?? DefaultTextStyle.of(context).style.color,
           end: widget.hoverColor)
       .animate(_controller);
+  final ValueNotifier<bool> _underline = ValueNotifier(false);
 
   @override
   void dispose() {
@@ -37,27 +40,49 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (e) {
+        if (widget.underline && widget.underlineHover) {
+          _underline.value = true;
+        }
         _controller.forward();
       },
       onExit: (e) {
+        if (widget.underline && widget.underlineHover) {
+          _underline.value = false;
+        }
+        _underline.value = false;
         _controller.reverse();
       },
       child: AnimatedBuilder(
           animation: _animation,
           builder: (context, child) {
-            return SelectableText.rich(
-              TextSpan(
-                text: widget.text,
-                style: TextStyle(
-                  color: _animation.value,
-                  decoration: widget.underline
-                      ? TextDecoration.underline
-                      : TextDecoration.none,
-                  decorationColor: _animation.value,
-                ),
-                recognizer: (TapGestureRecognizer()..onTap = widget.onTap),
-              ),
-            );
+            return ValueListenableBuilder<bool>(
+                valueListenable: _underline,
+                builder: (context, value, _) {
+                  return Transform.translate(
+                    offset: const Offset(0, 5),
+                    child: SelectableText.rich(
+                      maxLines: 1,
+                      TextSpan(
+                        text: widget.text,
+                        style: TextStyle(
+                          color: Colors.transparent,
+                          shadows: [
+                            Shadow(
+                              color: _animation.value!,
+                              offset: const Offset(0, -5),
+                            )
+                          ],
+                          decoration: value
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
+                          decorationColor: _animation.value,
+                        ),
+                        recognizer: (TapGestureRecognizer()
+                          ..onTap = widget.onTap),
+                      ),
+                    ),
+                  );
+                });
           }),
     );
   }

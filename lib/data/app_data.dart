@@ -4,8 +4,13 @@ import 'package:function_helpers/function_helpers.dart';
 export 'car_highlights.dart';
 export 'car_lineup.dart';
 export 'news_headlines.dart';
+export 'social_logos.dart';
+export 'bottom_info_groups.dart';
 
 class AppData {
+  static String companyInfo =
+      '''At Silvian Automobile PH, we spearhead innovation in the automotive industry, blending state-of-the-art technology with unparalleled craftsmanship. Our commitment to excellence drives us to engineer vehicles that embody precision, performance, and sustainability.''';
+
   static String selectedLocale = 'en';
 
   static double maxWidthConstraints = 1280.0;

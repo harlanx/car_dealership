@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:image/image.dart' as img;
 
 extension WidgetListExt on List<Widget> {
   /// Insert [widget] between each member of this list
@@ -58,5 +61,32 @@ extension StringEx on String {
         textDirection: TextDirection.ltr)
       ..layout(minWidth: 0, maxWidth: maxWidth);
     return textPainter.size;
+  }
+}
+
+extension ImageEx on Image {
+  static Future<MemoryImage> assetCropped(
+    String path,
+    double x,
+    y,
+    size,
+  ) async {
+    // Flutter web doesn't support dart:io so we manually load the asset
+    // Make sure to call WidgetsFlutterBinding.ensureInitialized(); in main method to use rootBundle.
+    final bytes = (await rootBundle.load(path)).buffer.asUint8List();
+
+    final decoded = img.PngDecoder().decode(bytes);
+    if (decoded == null) return Future.error('Cannot decode image file');
+
+    final cropped =
+        img.copyCrop(decoded, x: x.toInt(), y: y, width: size, height: size);
+
+    // Have to re-encode using this package to make it to work
+    // Not sure why it doesn't work when directly accessing getBytes();
+    final encoded = img.encodePng(cropped, level: 1, singleFrame: true);
+
+    final result = MemoryImage(encoded);
+
+    return result;
   }
 }
