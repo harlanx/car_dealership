@@ -8,6 +8,7 @@ import 'content/home_highlight.dart';
 import 'content/home_lineup.dart';
 import 'content/home_news.dart';
 import 'content/home_bottom_info.dart';
+import 'content/home_copyright_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -34,6 +35,7 @@ class HomeScreen extends StatelessWidget {
                       HomeLineup(size: MediaQuery.of(context).size),
                       HomeNews(size: MediaQuery.of(context).size),
                       HomeBottomInfo(size: MediaQuery.of(context).size),
+                      HomeCopyrightBar(size: MediaQuery.of(context).size),
                     ],
                   ),
                 ),
