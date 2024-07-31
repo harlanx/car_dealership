@@ -109,7 +109,7 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 20.0, vertical: 8),
-                                  child: InkWell(
+                                  child: GestureDetector(
                                     onTap: () => {},
                                     child: Image.asset(
                                       'assets/icons/logo.png',
