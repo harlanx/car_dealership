@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: subosito/flutter-action@v2
@@ -17,14 +17,14 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
       - name: Build Web
-        run: flutter build web --release --source-maps
+        run: flutter build web --release --base-href /${{github.event.repository.name}}/
       - name: Deploy
         run: |
           cd build/web
           git init
           git config user.name "harlanx"
           git config user.email "silan.harry@gmail.com"
-          git remote add secure-origin https://username:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          git remote add secure-origin https://username:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git
           git checkout -b gh-pages
           git add .
           git commit -m "Deployed Github Pages"
