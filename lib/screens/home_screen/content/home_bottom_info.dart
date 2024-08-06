@@ -20,66 +20,63 @@ class HomeBottomInfo extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: AppData.colorSwatch.shade900,
-      padding: const EdgeInsets.symmetric(vertical: 80),
+      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 8),
       child: Wrap(
         direction: Axis.horizontal,
         alignment: WrapAlignment.center,
         runSpacing: 50,
-        spacing: _screenLarge ? 120 : 80,
+        spacing: _screenLarge ? 120 : 40,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MouseRegion(
-                  cursor: SystemMouseCursors.click,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Image.asset(
-                      'assets/icons/logo.png',
-                      fit: BoxFit.scaleDown,
-                      width: 50,
-                      filterQuality: FilterQuality.low,
-                      isAntiAlias: true,
-                    ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Image.asset(
+                    'assets/icons/logo.png',
+                    fit: BoxFit.scaleDown,
+                    width: 50,
+                    filterQuality: FilterQuality.low,
+                    isAntiAlias: true,
                   ),
                 ),
-                const SizedBox(height: 20),
-                const WebLink(
-                  text: 'Silvian Automobile PH',
-                  color: Colors.white,
-                  hoverColor: Colors.white,
-                  underline: true,
-                  underlineHover: true,
-                ),
-                const SizedBox(height: 20),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 300),
-                  child: SelectableText(
-                    AppData.companyInfo,
-                    style: const TextStyle(
-                      color: Colors.white,
-                    ),
+              ),
+              const SizedBox(height: 20),
+              const WebLink(
+                text: 'Silvian Automobile PH',
+                color: Colors.white,
+                hoverColor: Colors.white,
+                underline: true,
+                underlineHover: true,
+              ),
+              const SizedBox(height: 20),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 300),
+                child: SelectableText(
+                  AppData.companyInfo,
+                  style: const TextStyle(
+                    color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    for (var logo in SocialLogos.logos)
-                      DisplayLogo(
-                        path: SocialLogos.sourceImage,
-                        x: logo.x,
-                        y: logo.y,
-                      ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  for (var logo in SocialLogos.logos)
+                    DisplayLogo(
+                      path: SocialLogos.sourceImage,
+                      x: logo.x,
+                      y: logo.y,
+                    ),
+                ],
+              ),
+            ],
           ),
           for (var group in infoGroups.entries)
             BottomInfo(

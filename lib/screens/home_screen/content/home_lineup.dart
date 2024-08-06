@@ -83,7 +83,7 @@ class _HomeLineupState extends State<HomeLineup>
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
           height: _screenLarge ? 400 : 250,
           width: double.infinity,
           child: Stack(
@@ -99,6 +99,7 @@ class _HomeLineupState extends State<HomeLineup>
                       : const ScrollPhysics(),
                   enableInfiniteScroll: true,
                   viewportFraction: _viewPort,
+                  disableCenter: true,
                   autoPlayCurve: Curves.easeInOutCubic,
                   clipBehavior: Clip.antiAlias,
                   autoPlayInterval: const Duration(seconds: 5),
@@ -185,6 +186,7 @@ class _HomeLineupState extends State<HomeLineup>
             direction: Axis.horizontal,
             alignment: WrapAlignment.center,
             runAlignment: WrapAlignment.center,
+            runSpacing: 5,
             spacing: 20,
             children: [
               SlideButton(
@@ -254,16 +256,12 @@ class _CarLineupState extends State<CarLineup>
     with SingleTickerProviderStateMixin {
   late final _controller = AnimationController(
       vsync: this, duration: const Duration(milliseconds: 300));
-  late final Animation<Color?> _animation =
+  late final Animation<double> _backgroundAnimation =
+      CurvedAnimation(parent: _controller, curve: Curves.easeInSine);
+  late final Animation<Color?> _textAnimation =
       ColorTween(begin: Colors.black, end: Colors.white).animate(_controller);
 
   late final car = carLineup[widget.index];
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -282,8 +280,7 @@ class _CarLineupState extends State<CarLineup>
           fit: StackFit.expand,
           children: [
             AnimatedBuilder(
-              animation:
-                  _controller.drive(CurveTween(curve: Curves.easeInSine)),
+              animation: _backgroundAnimation,
               builder: (context, _) {
                 return ClipPath(
                   clipper: AngledClipper(_controller.value),
@@ -337,15 +334,15 @@ class _CarLineupState extends State<CarLineup>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     AnimatedBuilder(
-                      animation: _animation,
+                      animation: _textAnimation,
                       builder: (context, _) {
                         return Text(
                           car.modelName,
                           style: TextStyle(
-                            color: _animation.value,
+                            color: _textAnimation.value,
                             fontFamily: 'Lato',
                             fontWeight: FontWeight.w900,
-                            fontSize: 25,
+                            fontSize: widget.screenLarge ? 25 : 20,
                           ),
                         );
                       },

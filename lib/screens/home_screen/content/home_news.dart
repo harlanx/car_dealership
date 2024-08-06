@@ -19,8 +19,7 @@ class HomeNews extends StatefulWidget {
 
 class _HomeNewsState extends State<HomeNews> {
   bool get _screenLarge {
-    final sWidth = widget.size.width;
-    return sWidth >= 1280;
+    return widget.size.width >= 1280;
   }
 
   @override
@@ -56,9 +55,13 @@ class _HomeNewsState extends State<HomeNews> {
             padding: const EdgeInsets.all(8),
             crossAxisCount: _screenLarge ? 3 : 2,
             scrollDirection: Axis.vertical,
+            physics: const NeverScrollableScrollPhysics(),
             mainAxisSpacing: 10,
             itemBuilder: (context, index) {
-              return NewsBox(news: newsHeadlines[index]);
+              return NewsBox(
+                news: newsHeadlines[index],
+                screenLarge: _screenLarge,
+              );
             },
           ),
         ],
@@ -71,8 +74,10 @@ class NewsBox extends StatefulWidget {
   const NewsBox({
     super.key,
     required this.news,
+    required this.screenLarge,
   });
   final News news;
+  final bool screenLarge;
 
   @override
   State<NewsBox> createState() => _NewsBoxState();
@@ -148,7 +153,7 @@ class _NewsBoxState extends State<NewsBox> with SingleTickerProviderStateMixin {
                                     maxLines: 1,
                                     style: TextStyle(
                                       color: _textColor.value,
-                                      fontSize: 18,
+                                      fontSize: widget.screenLarge ? 18 : 15,
                                       fontWeight: FontWeight.w900,
                                     ),
                                   ),
@@ -162,10 +167,10 @@ class _NewsBoxState extends State<NewsBox> with SingleTickerProviderStateMixin {
                                   child: Text(
                                     widget.news.description,
                                     overflow: TextOverflow.ellipsis,
-                                    maxLines: 2,
+                                    maxLines: widget.screenLarge ? 2 : 3,
                                     style: TextStyle(
                                       color: _textColor.value,
-                                      fontSize: 15,
+                                      fontSize: widget.screenLarge ? 15 : 12,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),

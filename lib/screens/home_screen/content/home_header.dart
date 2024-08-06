@@ -488,6 +488,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
             } else {
               return ListView(
                 shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   for (var item in widget.items)
                     ListTile(

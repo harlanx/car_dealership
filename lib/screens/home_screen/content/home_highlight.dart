@@ -34,8 +34,7 @@ class _HomeHighlightState extends State<HomeHighlight>
   }
 
   bool get _screenLarge {
-    final sWidth = widget.size.width;
-    return sWidth >= 1280;
+    return widget.size.width >= 1280;
   }
 
   @override
@@ -86,7 +85,7 @@ class _HomeHighlightState extends State<HomeHighlight>
                     borderColor: AppData.color,
                     endChildColor: Colors.white,
                     endColor: AppData.color,
-                    size: 60,
+                    size: _screenLarge ? 60 : 30,
                   ),
                   child: const Icon(Icons.arrow_back_ios_sharp),
                 ),
@@ -101,7 +100,7 @@ class _HomeHighlightState extends State<HomeHighlight>
                     borderColor: AppData.color,
                     endChildColor: Colors.white,
                     endColor: AppData.color,
-                    size: 60,
+                    size: _screenLarge ? 60 : 30,
                   ),
                   child: const Icon(Icons.arrow_forward_ios_sharp),
                 ),
@@ -129,10 +128,10 @@ class _HomeHighlightState extends State<HomeHighlight>
                       effect: SlideEffect(
                         activeDotColor: AppData.color,
                         paintStyle: PaintingStyle.stroke,
-                        dotHeight: _screenLarge ? 16 : 15,
-                        dotWidth: _screenLarge ? 20 : 15,
+                        dotHeight: _screenLarge ? 16 : 8,
+                        dotWidth: _screenLarge ? 20 : 8,
                         dotColor: Colors.white,
-                        strokeWidth: _screenLarge ? 2 : 1.5,
+                        strokeWidth: 2,
                       ),
                     ),
                   ),
@@ -289,7 +288,10 @@ class _CarHighlightBoxState extends State<CarHighlightBox>
                         endColor: AppData.color,
                         size: 40,
                       ),
-                      child: const Icon(Icons.add),
+                      child: const Icon(
+                        Icons.add,
+                        size: 20,
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.only(left: 10.0),
@@ -320,9 +322,12 @@ class _CarHighlightBoxState extends State<CarHighlightBox>
                         borderSize: 1.5,
                         endChildColor: Colors.white,
                         endColor: AppData.color,
-                        size: 40,
+                        size: 20,
                       ),
-                      child: const Icon(Icons.add),
+                      child: const Icon(
+                        Icons.add,
+                        size: 15,
+                      ),
                     ),
                     const Padding(
                       padding: EdgeInsets.only(left: 10.0),

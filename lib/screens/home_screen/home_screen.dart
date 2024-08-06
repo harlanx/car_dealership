@@ -12,13 +12,13 @@ import 'content/home_copyright_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  final ScrollController _scHeader = ScrollController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
-        controller: _scHeader,
+        controller: _scrollController,
         shrinkWrap: true,
         slivers: [
           const HomePinnedExtra(),
