@@ -31,9 +31,9 @@ class MyApp extends StatelessWidget {
         Locale('en'), // English
         Locale('fil'), // Filipino
       ],
-      initialRoute: '/',
+      initialRoute: '',
       routes: {
-        '/': (context) => HomeScreen(),
+        '': (context) => HomeScreen(),
         'login': (context) => const LoginScreen(),
       },
     );
