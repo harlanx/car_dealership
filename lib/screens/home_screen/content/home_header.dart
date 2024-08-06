@@ -334,8 +334,6 @@ class HomeHeaderMenuContent extends StatefulWidget {
 }
 
 class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
-  // TODO: Do the main menu content
-
   @override
   Widget build(BuildContext context) {
     final chunks = widget.items.slices(4);
@@ -706,8 +704,9 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
       ),
       menuChild: HomeHeaderMenuContent(
         items: mainMenuContent,
-        leadingItems: _leadingItems,
-        trailingItems: [],
+        // TODO: Move Header Menu to LisTile
+        leadingItems: const [],
+        trailingItems: const [],
       ),
     ),
   ];
