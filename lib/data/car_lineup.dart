@@ -1,6 +1,6 @@
 import '../models/models.dart';
 
-final List<CarProduct> carLineup = [
+final carLineup = <CarProduct>[
   CarProduct(
     modelName: 'Tesla Model S',
     preview: [

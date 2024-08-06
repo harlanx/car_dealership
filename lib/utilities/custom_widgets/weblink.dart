@@ -53,37 +53,38 @@ class _WebLinkState extends State<WebLink> with SingleTickerProviderStateMixin {
         _controller.reverse();
       },
       child: AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) {
-            return ValueListenableBuilder<bool>(
-                valueListenable: _underline,
-                builder: (context, value, _) {
-                  return Transform.translate(
-                    offset: const Offset(0, 5),
-                    child: SelectableText.rich(
-                      maxLines: 1,
-                      TextSpan(
-                        text: widget.text,
-                        style: TextStyle(
-                          color: Colors.transparent,
-                          shadows: [
-                            Shadow(
-                              color: _animation.value!,
-                              offset: const Offset(0, -5),
-                            )
-                          ],
-                          decoration: value
-                              ? TextDecoration.underline
-                              : TextDecoration.none,
-                          decorationColor: _animation.value,
-                        ),
-                        recognizer: (TapGestureRecognizer()
-                          ..onTap = widget.onTap),
-                      ),
+        animation: _animation,
+        builder: (context, child) {
+          return ValueListenableBuilder<bool>(
+            valueListenable: _underline,
+            builder: (context, value, _) {
+              return Transform.translate(
+                offset: const Offset(0, 5),
+                child: SelectableText.rich(
+                  maxLines: 1,
+                  TextSpan(
+                    text: widget.text,
+                    style: TextStyle(
+                      color: Colors.transparent,
+                      shadows: [
+                        Shadow(
+                          color: _animation.value!,
+                          offset: const Offset(0, -5),
+                        )
+                      ],
+                      decoration: value
+                          ? TextDecoration.underline
+                          : TextDecoration.none,
+                      decorationColor: _animation.value,
                     ),
-                  );
-                });
-          }),
+                    recognizer: (TapGestureRecognizer()..onTap = widget.onTap),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

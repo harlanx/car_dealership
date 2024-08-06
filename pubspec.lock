@@ -109,10 +109,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: bc7d68c6207bba88943537c19b57ecc34cae9ef7
+      resolved-ref: ce3d663a9c742f521561305cd0a0ea63b289e58f
       url: "https://github.com/harlanx/function_helpers.git"
     source: git
-    version: "1.0.0"
+    version: "1.0.1"
   image:
     dependency: "direct main"
     description:

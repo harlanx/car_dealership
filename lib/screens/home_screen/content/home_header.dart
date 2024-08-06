@@ -1,401 +1,809 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../data/app_data.dart';
+import '../../../models/models.dart';
 import '../../../utilities/utilities.dart';
 
-final _leadingItems = <HomeHeaderItem>[
-  HomeHeaderItem(
-      key: 'Models', content: const HomeHeaderItemContent(color: Colors.blue)),
-  HomeHeaderItem(
-      key: 'Dealers',
-      content: const HomeHeaderItemContent(color: Colors.green)),
-  HomeHeaderItem(
-      key: 'Services',
-      content: const HomeHeaderItemContent(color: Colors.yellow)),
-  HomeHeaderItem(key: 'Careers'),
-];
+class HomeHeaderMenu extends StatefulWidget {
+  const HomeHeaderMenu({
+    super.key,
+    required this.label,
+    required this.items,
+    required this.activeContent,
+    this.textStyle,
+    this.onTap,
+    this.content,
+  });
 
-final _trailingItems = <HomeHeaderItem>[
-  HomeHeaderItem(key: 'Store'),
-  HomeHeaderItem(key: 'FAQ'),
-  HomeHeaderItem(key: 'About Us'),
-  HomeHeaderItem(key: 'Contact Us'),
-];
+  final String label;
+  final List<MenuItem> items;
+  final ValueNotifier<String> activeContent;
+  final TextStyle? textStyle;
+  final VoidCallback? onTap;
+  final HomeHeaderContentBox? content;
 
-class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
   @override
-  State<HomeHeader> createState() => _HomeHeaderState();
+  State<HomeHeaderMenu> createState() => _HomeHeaderMenuState();
 }
 
-class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 500),
-      ),
-      _menuCtrlr = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 500),
-      );
-
-  late final Animation<double> _animation = CurvedAnimation(
-        parent: _controller,
-        curve: Curves.fastOutSlowIn,
-      ),
-      _menuAnim = CurvedAnimation(
-        parent: _menuCtrlr,
-        curve: Curves.fastOutSlowIn,
-      );
-
-  final _contentFocused = ValueNotifier<bool>(false);
-
-  String _focusedItem = '';
-  bool menuSelected = false;
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _menuCtrlr.dispose();
-    super.dispose();
-  }
+class _HomeHeaderMenuState extends State<HomeHeaderMenu>
+    with SingleTickerProviderStateMixin {
+  late final _labelSize =
+      widget.label.toUpperCase().textSize(style: widget.textStyle);
+  late final menu =
+      widget.items.singleWhere((menu) => menu.label == widget.label);
+  late final exceptMenu =
+      widget.items.where((menu) => menu.label != widget.label);
+  late final _animation = CurvedAnimation(
+    parent: menu.controller,
+    curve: Curves.decelerate,
+  );
 
   @override
   Widget build(BuildContext context) {
-    return TapRegion(
-      onTapOutside: (event) {
-        _menuCtrlr.reverse();
-        _controller.reverse();
-      },
-      child: MouseRegion(
-        onExit: (_) {
-          if (!menuSelected) {
-            _menuCtrlr.reverse();
-            _contentFocused.value = false;
-            _controller.reverse();
+    final isMainMenu = menu.label == 'Menu';
+    // Main Menu
+    if (isMainMenu) {
+      return IconButton(
+        onPressed: () {
+          if (_animation.status == AnimationStatus.dismissed) {
+            widget.activeContent.value = widget.label;
+            menu.controller.forward();
+          } else {
+            widget.activeContent.value = '';
+            menu.controller.reverse();
+          }
+          for (var except in exceptMenu) {
+            except.controller.reverse();
           }
         },
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                border: Border(
-                  bottom: BorderSide(
-                    color: AppData.color,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return DefaultTextStyle.merge(
-                    style: const TextStyle(color: Colors.white),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        icon: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) {
+            return AnimatedIcon(
+              icon: AnimatedIcons.menu_close,
+              progress: _animation,
+            );
+          },
+        ),
+      );
+    }
+
+    // Labeled Menu
+    return ValueListenableBuilder<String>(
+        valueListenable: widget.activeContent,
+        builder: (context, value, content) {
+          final isMenuActive = value == 'Menu';
+          return MouseRegion(
+            cursor: !isMenuActive
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
+            onEnter: (event) {
+              if (!isMenuActive) {
+                widget.activeContent.value = widget.label;
+                menu.controller.forward();
+                for (var except in exceptMenu) {
+                  except.controller.reverse();
+                }
+              }
+            },
+            child: GestureDetector(
+              onTap: () {},
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    menu.context = context;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ConstrainedWidthFlexible(
-                          flex: 1,
-                          flexSum: 2,
-                          minWidth: 400,
-                          maxWidth: 650,
-                          outerConstraints: constraints,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Flexible(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20.0, vertical: 8),
-                                  child: GestureDetector(
-                                    onTap: () => {},
-                                    child: Image.asset(
-                                      'assets/icons/logo.png',
-                                      fit: BoxFit.scaleDown,
-                                      filterQuality: FilterQuality.low,
-                                      isAntiAlias: true,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ...[
-                                for (var item in _leadingItems)
-                                  _headerItemBox(item, context)
-                              ],
-                            ],
-                          ),
-                        ),
-                        Flexible(
-                          child: ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 500),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Flexible(
-                                  child: Visibility(
-                                    visible: constraints.maxWidth >= 1020,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        for (var item in _trailingItems)
-                                          _headerItemBox(item, context)
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal:
-                                        constraints.maxWidth >= 1020 ? 20 : 5.0,
-                                  ),
-                                  child: Center(
-                                    child: IconButton(
-                                      icon: AnimatedIcon(
-                                        icon: AnimatedIcons.menu_close,
-                                        progress: _menuAnim,
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.center,
+                            child: AnimatedDefaultTextStyle(
+                              style:
+                                  DefaultTextStyle.of(context).style.copyWith(
+                                        color: !isMenuActive
+                                            ? widget.textStyle?.color
+                                            : Colors.grey.shade700,
                                       ),
-                                      onPressed: () {
-                                        if (_menuCtrlr.status ==
-                                            AnimationStatus.dismissed) {
-                                          setState(() {
-                                            menuSelected = true;
-                                          });
-                                          _menuCtrlr.forward();
-                                          _controller.forward();
-                                        } else {
-                                          _menuCtrlr.reverse();
-                                          _controller
-                                              .reverse()
-                                              .then((value) => setState(() {
-                                                    menuSelected = false;
-                                                  }));
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              duration: menu.controller.duration!,
+                              child: Text(
+                                widget.label.toUpperCase(),
+                              ),
                             ),
                           ),
                         ),
+                        Container(
+                          height: 5,
+                          width: _labelSize.width * _animation.value,
+                          color: DefaultTextStyle.of(context).style.color,
+                        ),
                       ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            HomeHeaderContentBox(
-              animation: _animation,
-              focusedItem: _focusedItem,
-              items: _leadingItems,
-              menuSelected: menuSelected,
-              menuItem: Column(
-                children: [
-                  for (var color in Colors.primaries)
-                    Container(
-                      color: color,
-                      height: RandomHelper.randRangeDouble(5, 20),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _headerItemBox(HomeHeaderItem item, BuildContext context) {
-    final size = (TextPainter(
-            text: TextSpan(
-              text: item.key.toUpperCase(),
-              style: const TextStyle(fontSize: 15),
-            ),
-            maxLines: 1,
-            textScaler: MediaQuery.of(context).textScaler,
-            textDirection: TextDirection.ltr)
-          ..layout())
-        .size;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        onEnter: (_) {
-          setState(() {
-            if (item.hasContent) {
-              menuSelected = false;
-              _menuCtrlr.reverse();
-            }
-            _focusedItem = item.key;
-          });
-          _contentFocused.value = true;
-          if (!menuSelected) {
-            if (item.hasContent) {
-              _controller.forward();
-            } else {
-              _controller.reverse();
-            }
-          }
-        },
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 95,
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Center(
-                  child: item.child ??
-                      Text(
-                        item.key.toUpperCase(),
-                        style: const TextStyle(fontSize: 15),
-                      ),
+                    );
+                  },
                 ),
               ),
             ),
-            Expanded(
-              flex: 5,
-              child: ValueListenableBuilder<bool>(
-                  valueListenable: _contentFocused,
-                  builder: (context, val, child) {
-                    final bool shouldExpand = val && _focusedItem == item.key;
-                    return AnimatedSize(
-                      duration: _controller.duration! * 0.7,
-                      child: Container(
-                        color: DefaultTextStyle.of(context).style.color,
-                        width: shouldExpand ? size.width : 0,
-                      ),
-                    );
-                  }),
+          );
+        });
+  }
+}
+
+class LeadingMenus extends StatefulWidget {
+  const LeadingMenus({
+    super.key,
+    required this.controller,
+    required this.activeContent,
+    required this.items,
+    required this.allItems,
+    required this.showMenus,
+  });
+
+  final AnimationController controller;
+  final ValueNotifier<String> activeContent;
+  final List<MenuItem> items;
+  final List<MenuItem> allItems;
+  final bool showMenus;
+
+  @override
+  State<LeadingMenus> createState() => LeadingMenusState();
+}
+
+class LeadingMenusState extends State<LeadingMenus> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8),
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => {},
+              child: Image.asset(
+                'assets/icons/logo.png',
+                fit: BoxFit.scaleDown,
+                filterQuality: FilterQuality.low,
+                isAntiAlias: true,
+              ),
             ),
-          ],
+          ),
         ),
-      ),
+        for (var item in widget.items)
+          Flexible(
+            key: ValueKey(item.label),
+            child: Offstage(
+              offstage: !widget.showMenus,
+              child: HomeHeaderMenu(
+                label: item.label,
+                items: widget.allItems,
+                activeContent: widget.activeContent,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
 
-class HomeHeaderItem {
-  HomeHeaderItem({
-    required this.key,
-    this.content,
-    this.child,
-    this.onTap,
+class TrailingMenus extends StatefulWidget {
+  const TrailingMenus({
+    super.key,
+    required this.controller,
+    required this.activeContent,
+    required this.items,
+    required this.allItems,
+    required this.showMenus,
   });
 
-  final String key;
-  final Widget? child;
-  final HomeHeaderItemContent? content;
-  final VoidCallback? onTap;
+  final AnimationController controller;
+  final ValueNotifier<String> activeContent;
+  final List<MenuItem> items;
+  final List<MenuItem> allItems;
+  final bool showMenus;
 
-  bool get hasContent => content != null;
+  @override
+  State<TrailingMenus> createState() => _TrailingMenusState();
 }
 
-class HomeHeaderItemContent {
-  const HomeHeaderItemContent({
-    Key? key,
-    this.child,
-    this.alignment = Alignment.center,
-    this.color = Colors.grey,
-  });
-
-  final Widget? child;
-  final Alignment alignment;
-  final MaterialColor color;
-
-  final List _colorShades = const <int>[
-    50,
-    100,
-    200,
-    300,
-    400,
-    500,
-    600,
-    700,
-    800,
-    900,
-  ];
-
-  Widget get contentChild {
-    if (child != null) {
-      return child!;
-    } else {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (var shade in _colorShades.reversed)
-            Container(
-              color: color[shade],
-              height: RandomHelper.randRangeDouble(5, 50),
-            ),
+class _TrailingMenusState extends State<TrailingMenus> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (!widget.showMenus) ...[
+          IconButton(onPressed: () {}, icon: const Icon(Icons.message_rounded)),
+          IconButton(onPressed: () {}, icon: const Icon(Icons.search_outlined)),
         ],
-      );
-    }
+        for (var item in widget.items)
+          Flexible(
+            key: ValueKey(item.label),
+            child: Offstage(
+              offstage: !widget.showMenus && item.label != 'Menu',
+              child: HomeHeaderMenu(
+                label: item.label,
+                items: widget.allItems,
+                activeContent: widget.activeContent,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
 
 class HomeHeaderContentBox extends StatefulWidget {
   const HomeHeaderContentBox({
     super.key,
+    required this.controller,
     required this.animation,
-    required this.focusedItem,
-    required this.items,
-    required this.menuItem,
-    required this.menuSelected,
+    required this.activeContent,
+    required this.contents,
   });
 
-  final Animation<double> animation;
-  final String focusedItem;
-  final List<HomeHeaderItem> items;
-  final Widget menuItem;
-  final bool menuSelected;
+  final AnimationController controller;
+  final CurvedAnimation animation;
+  final ValueNotifier<String> activeContent;
+  final List<MenuItem> contents;
 
   @override
   State<HomeHeaderContentBox> createState() => _HomeHeaderContentBoxState();
 }
 
-class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox> {
-  int lastFocused = 0;
+class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
+    with SingleTickerProviderStateMixin {
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: widget.activeContent,
+      builder: (context, value, child) {
+        final menu =
+            widget.contents.singleWhereOrNull((item) => item.label == value);
+        Widget result;
+        if (value == 'Menu') {
+          result = KeyedSubtree(
+            key: ValueKey(value),
+            child: menu!.menuChild!,
+          );
+        } else if (value.isEmpty || menu?.content == null) {
+          result = SizedBox(key: ValueKey(value));
+        } else {
+          final labelPos = menu?.context?.globalPaintBounds;
 
-  int get _focusedIndex {
-    final index =
-        widget.items.indexWhere((element) => element.key == widget.focusedItem);
-    if (index < 0) {
-      return lastFocused;
-    } else {
-      if (widget.items[index].hasContent) {
-        lastFocused = index;
-        return index;
-      }
-      return lastFocused;
-    }
-  }
+          // Non-Aligned to the label
+          // result = KeyedSubtree(
+          //   key: ValueKey(value),
+          //   child: menu!.content!,
+          // );
 
-  List<Widget> get _itemChildren {
-    return [
-      for (var item in widget.items)
-        if (item.hasContent) item.content!.contentChild
-    ];
+          // Aligned to the label
+          result = Padding(
+            padding: EdgeInsets.only(left: labelPos?.left ?? 0.0),
+            key: ValueKey(value),
+            child: HomeHeaderContentItem(items: menu!.content!),
+          );
+        }
+
+        return Container(
+          alignment: Alignment.topLeft,
+          decoration: const BoxDecoration(
+            color: Colors.black,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white,
+                width: 2.0,
+              ),
+            ),
+          ),
+          child: AnimatedSize(
+            duration: widget.controller.duration!,
+            curve: widget.animation.curve,
+            alignment: Alignment.topLeft,
+            child: result,
+          ),
+        );
+      },
+    );
   }
+}
+
+class HomeHeaderMenuContent extends StatefulWidget {
+  const HomeHeaderMenuContent({
+    super.key,
+    required this.items,
+    required this.leadingItems,
+    required this.trailingItems,
+  });
+
+  final List<String> items;
+  final List<MenuItem> leadingItems;
+  final List<MenuItem> trailingItems;
+
+  @override
+  State<HomeHeaderMenuContent> createState() => _HomeHeaderMenuContentState();
+}
+
+class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
+  // TODO: Do the main menu content
 
   @override
   Widget build(BuildContext context) {
-    return SizeTransition(
-        sizeFactor: widget.animation,
-        axis: Axis.vertical,
-        child: Builder(builder: (context) {
-          if (widget.menuSelected) {
-            return widget.menuItem;
+    final chunks = widget.items.slices(4);
+    final itemList = chunks.map((e) => e.map((e) => e).toList()).toList();
+    itemList[itemList.length - 2].addAll([...itemList.last]);
+    itemList.removeLast();
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.topCenter,
+      padding: const EdgeInsets.all(50),
+      child: DefaultTextStyle(
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bool screenLarge = 650 <= constraints.maxWidth;
+            if (screenLarge) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var list in itemList) ...[
+                          Flexible(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                for (var item in list)
+                                  Flexible(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 15.0),
+                                      child: UnderlineButton(text: item),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ].insertBetween(
+                        Flexible(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 200),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20.0),
+                    child: Divider(),
+                  ),
+                  Flexible(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Flexible(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 450),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Languages'.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 30),
+                                Flexible(
+                                  child: Wrap(
+                                    spacing: 30,
+                                    runSpacing: 20,
+                                    children: [
+                                      for (var language in languages)
+                                        MouseRegion(
+                                          cursor: SystemMouseCursors.click,
+                                          child: Text(
+                                            language.toUpperCase(),
+                                            style: TextStyle(
+                                              color: language != languages.first
+                                                  ? Colors.white
+                                                  : Colors.grey,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 120),
+                            child: const SizedBox(
+                              width: double.infinity,
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Social'.toUpperCase(),
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 30),
+                              Flexible(
+                                child: Wrap(
+                                  spacing: 30,
+                                  runSpacing: 20,
+                                  children: [
+                                    for (var logo in SocialLogos.logos)
+                                      DisplayLogo(
+                                        path: SocialLogos.sourceImage,
+                                        x: logo.x,
+                                        y: logo.y,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            } else {
+              return ListView(
+                shrinkWrap: true,
+                children: [
+                  for (var item in widget.items)
+                    ListTile(
+                      onTap: () {},
+                      title: Text(
+                        item,
+                        textAlign: TextAlign.left,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class HomeHeaderContentItem extends StatefulWidget {
+  const HomeHeaderContentItem({
+    super.key,
+    required this.items,
+  });
+
+  final List<MenuContentItem> items;
+
+  @override
+  State<HomeHeaderContentItem> createState() => _HomeHeaderContentItemState();
+}
+
+class _HomeHeaderContentItemState extends State<HomeHeaderContentItem> {
+  final secondRow = ValueNotifier<List<MenuContentItem>?>([]);
+  String activeItem = '';
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var item in widget.items)
+                DefaultTextStyle(
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: MouseRegion(
+                      onEnter: (event) {
+                        secondRow.value = item.items;
+                        if (item.items != null) {
+                          activeItem = item.label;
+                        }
+                      },
+                      cursor: item.items == null
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic,
+                      child: ValueListenableBuilder(
+                        valueListenable: secondRow,
+                        builder: (context, value, child) {
+                          return Row(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(item.label.toUpperCase()),
+                              if (activeItem == item.label)
+                                const Icon(
+                                  Icons.keyboard_arrow_right_sharp,
+                                  size: 18,
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          ValueListenableBuilder(
+            valueListenable: secondRow,
+            builder: (context, value, child) {
+              if (value != null) {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 80.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var item in value)
+                        DefaultTextStyle(
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 15.0),
+                            child: MouseRegion(
+                              cursor: item.items == null
+                                  ? SystemMouseCursors.click
+                                  : SystemMouseCursors.basic,
+                              child: Text(item.label.toUpperCase()),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          )
+        ],
+      ),
+    );
+  }
+}
+
+// Main Widget
+class HomeHeader extends StatefulWidget {
+  const HomeHeader({super.key});
+
+  @override
+  State<HomeHeader> createState() => _HomeHeaderState();
+}
+
+class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
+  late final _leadingItems = <MenuItem>[
+    MenuItem(
+      label: 'Models',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+      content: modelsContent,
+    ),
+    MenuItem(
+      label: 'Dealers',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+      content: dealersContent,
+    ),
+    MenuItem(
+      label: 'Services',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+      content: servicesContent,
+    ),
+    MenuItem(
+      label: 'Careers',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+      content: carrersContent,
+    ),
+  ];
+
+  late final _trailingItems = <MenuItem>[
+    MenuItem(
+      label: 'Store',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    ),
+    MenuItem(
+      label: 'FAQ',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    ),
+    MenuItem(
+      label: 'About Us',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    ),
+    MenuItem(
+      label: 'Contact Us',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+    ),
+    MenuItem(
+      label: 'Menu',
+      controller: AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 300),
+      ),
+      menuChild: HomeHeaderMenuContent(
+        items: mainMenuContent,
+        leadingItems: _leadingItems,
+        trailingItems: [],
+      ),
+    ),
+  ];
+
+  late final _contentController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 400),
+  );
+
+  late final _contentAnimation = CurvedAnimation(
+    parent: _contentController,
+    curve: Curves.decelerate,
+  );
+
+  late final _allItems = [
+    ..._leadingItems,
+    ..._trailingItems,
+  ];
+
+  final activeContent = ValueNotifier<String>('');
+
+  @override
+  Widget build(BuildContext context) {
+    return TapRegion(
+      onTapOutside: (event) {
+        for (var item in _allItems) {
+          item.controller.reverse();
+        }
+        activeContent.value = '';
+        _contentController.reverse();
+      },
+      child: MouseRegion(
+        onExit: (event) {
+          if (activeContent.value != 'Menu') {
+            activeContent.value = '';
+            for (var item in _allItems) {
+              item.controller.reverse();
+            }
+            _contentController.reverse();
           }
-          return IndexedStack(
-            sizing: StackFit.loose,
-            index: _focusedIndex,
-            children: _itemChildren,
-          );
-        }));
+        },
+        child: AnimatedBuilder(
+          animation: _contentAnimation,
+          builder: (context, child) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  color: Colors.black,
+                  child: DefaultTextStyle.merge(
+                    style: const TextStyle(color: Colors.white),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final showLeading = constraints.maxWidth > 1000;
+                        final showTrailing = constraints.maxWidth > 600;
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            LeadingMenus(
+                              controller: _contentController,
+                              items: _leadingItems,
+                              allItems: _allItems,
+                              activeContent: activeContent,
+                              showMenus: showLeading,
+                            ),
+                            TrailingMenus(
+                              controller: _contentController,
+                              items: _trailingItems,
+                              allItems: _allItems,
+                              activeContent: activeContent,
+                              showMenus: showTrailing,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                Flexible(
+                  child: HomeHeaderContentBox(
+                    controller: _contentController,
+                    animation: _contentAnimation,
+                    activeContent: activeContent,
+                    contents: _allItems,
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
   }
 }

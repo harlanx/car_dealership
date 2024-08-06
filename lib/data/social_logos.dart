@@ -8,4 +8,6 @@ class SocialLogos {
   static const x = Alignment(25, 0);
   static const instagram = Alignment(150, 0);
   static const youtube = Alignment(75, 0);
+
+  static const logos = [facebook, x, instagram, youtube];
 }

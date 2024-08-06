@@ -4,7 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../data/app_data.dart';
-import '../../../models/car.dart';
+import '../../../models/models.dart';
 import '../../../utilities/utilities.dart';
 
 class HomeHighlight extends StatefulWidget {

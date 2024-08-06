@@ -70,26 +70,12 @@ class HomeBottomInfo extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    DisplayLogo(
-                      path: SocialLogos.sourceImage,
-                      x: SocialLogos.facebook.x,
-                      y: SocialLogos.facebook.y,
-                    ),
-                    DisplayLogo(
-                      path: SocialLogos.sourceImage,
-                      x: SocialLogos.x.x,
-                      y: SocialLogos.x.y,
-                    ),
-                    DisplayLogo(
-                      path: SocialLogos.sourceImage,
-                      x: SocialLogos.instagram.x,
-                      y: SocialLogos.instagram.y,
-                    ),
-                    DisplayLogo(
-                      path: SocialLogos.sourceImage,
-                      x: SocialLogos.youtube.x,
-                      y: SocialLogos.youtube.y,
-                    ),
+                    for (var logo in SocialLogos.logos)
+                      DisplayLogo(
+                        path: SocialLogos.sourceImage,
+                        x: logo.x,
+                        y: logo.y,
+                      ),
                   ],
                 ),
               ],
