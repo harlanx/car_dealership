@@ -1,7 +1,7 @@
-import 'package:carousel_slider/carousel_controller.dart';
-import 'package:carousel_slider/carousel_state.dart';
+import 'package:carousel_slider_plus/carousel_controller.dart';
+import 'package:carousel_slider_plus/carousel_state.dart';
 
-class CustomCarouselController extends CarouselControllerImpl {
+class CustomCarouselController extends CarouselSliderController {
   CarouselState? _state;
   CarouselState? get state => _state;
 

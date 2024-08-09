@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:collection/collection.dart';
 import 'package:intl/intl.dart';
 
@@ -90,7 +90,7 @@ class _HomeLineupState extends State<HomeLineup>
             fit: StackFit.expand,
             children: [
               CarouselSlider(
-                carouselController: _carouselController,
+                controller: _carouselController,
                 options: CarouselOptions(
                   initialPage: 0,
                   scrollDirection: Axis.horizontal,

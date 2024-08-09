@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:carousel_slider_plus/carousel_slider_plus.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../data/app_data.dart';
@@ -17,7 +17,7 @@ class HomeHighlight extends StatefulWidget {
 
 class _HomeHighlightState extends State<HomeHighlight>
     with SingleTickerProviderStateMixin {
-  final _carouselController = CustomCarouselController();
+  final _customController = CustomCarouselController();
 
   double get _aRatio {
     final sWidth = widget.size.width;
@@ -45,7 +45,7 @@ class _HomeHighlightState extends State<HomeHighlight>
         fit: StackFit.expand,
         children: [
           CarouselSlider(
-            carouselController: _carouselController,
+            controller: _customController,
             options: CarouselOptions(
               initialPage: 2,
               scrollDirection: Axis.horizontal,
@@ -63,7 +63,7 @@ class _HomeHighlightState extends State<HomeHighlight>
             items: [
               for (var car in carHighlights)
                 CarHighlightBox(
-                  carouselController: _carouselController,
+                  carouselController: _customController,
                   car: car,
                   screenLarge: _screenLarge,
                 )
@@ -76,7 +76,7 @@ class _HomeHighlightState extends State<HomeHighlight>
               children: [
                 PolyButton(
                   onPressed: () {
-                    _carouselController.previousPage(
+                    _customController.previousPage(
                       curve: Curves.easeInOutCubic,
                       duration: const Duration(seconds: 1),
                     );
@@ -91,7 +91,7 @@ class _HomeHighlightState extends State<HomeHighlight>
                 ),
                 PolyButton(
                   onPressed: () {
-                    _carouselController.nextPage(
+                    _customController.nextPage(
                       curve: Curves.easeInOutCubic,
                       duration: const Duration(seconds: 1),
                     );
@@ -108,7 +108,7 @@ class _HomeHighlightState extends State<HomeHighlight>
             ),
           ),
           FutureBuilder(
-            future: _carouselController.onReady,
+            future: _customController.onReady,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 return Padding(
@@ -116,10 +116,10 @@ class _HomeHighlightState extends State<HomeHighlight>
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: SmoothPageIndicator(
-                      controller: _carouselController.state!.pageController!,
-                      count: _carouselController.state!.itemCount!,
+                      controller: _customController.state!.pageController!,
+                      count: _customController.state!.itemCount!,
                       onDotClicked: (val) {
-                        _carouselController.animateToPage(
+                        _customController.animateToPage(
                           val - 1,
                           curve: Curves.easeInOutCubic,
                           duration: const Duration(seconds: 1),
@@ -154,7 +154,7 @@ class CarHighlightBox extends StatefulWidget {
     required this.screenLarge,
   });
 
-  final CarouselController carouselController;
+  final CarouselSliderController carouselController;
   final CarProduct car;
   final bool screenLarge;
 
