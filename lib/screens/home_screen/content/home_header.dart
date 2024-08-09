@@ -249,12 +249,14 @@ class HomeHeaderContentBox extends StatefulWidget {
     required this.animation,
     required this.activeContent,
     required this.contents,
+    required this.size,
   });
 
   final AnimationController controller;
   final CurvedAnimation animation;
   final ValueNotifier<String> activeContent;
   final List<MenuItem> contents;
+  final Size size;
 
   @override
   State<HomeHeaderContentBox> createState() => _HomeHeaderContentBoxState();
@@ -264,13 +266,15 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
+    final screenSmall = widget.size.width <= 600;
     return ValueListenableBuilder(
       valueListenable: widget.activeContent,
       builder: (context, value, child) {
         final menu =
             widget.contents.singleWhereOrNull((item) => item.label == value);
+        final isMainMenu = value == 'Menu';
         Widget result;
-        if (value == 'Menu') {
+        if (isMainMenu) {
           result = KeyedSubtree(
             key: ValueKey(value),
             child: menu!.menuChild!,
@@ -295,6 +299,7 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
         }
 
         return Container(
+          height: isMainMenu && screenSmall ? widget.size.height - 78 : null,
           alignment: Alignment.topLeft,
           decoration: const BoxDecoration(
             color: Colors.black,
@@ -323,11 +328,13 @@ class HomeHeaderMenuContent extends StatefulWidget {
     required this.items,
     required this.leadingItems,
     required this.trailingItems,
+    required this.size,
   });
 
   final List<String> items;
   final List<MenuItem> leadingItems;
   final List<MenuItem> trailingItems;
+  final Size size;
 
   @override
   State<HomeHeaderMenuContent> createState() => _HomeHeaderMenuContentState();
@@ -340,10 +347,11 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
     final itemList = chunks.map((e) => e.map((e) => e).toList()).toList();
     itemList[itemList.length - 2].addAll([...itemList.last]);
     itemList.removeLast();
+
     return Container(
       width: double.infinity,
       alignment: Alignment.topCenter,
-      padding: const EdgeInsets.all(50),
+      padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 10),
       child: DefaultTextStyle(
         style: const TextStyle(
           color: Colors.white,
@@ -352,7 +360,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final bool screenLarge = 650 <= constraints.maxWidth;
+            final screenLarge = 650 <= constraints.maxWidth;
             if (screenLarge) {
               return Column(
                 mainAxisSize: MainAxisSize.min,
@@ -370,14 +378,15 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 for (var item in list)
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 15.0),
-                                      child: UnderlineButton(text: item),
-                                    ),
+                                  Flexible(child: UnderlineButton(text: item))
+                              ].insertBetween(
+                                Flexible(
+                                  child: ConstrainedBox(
+                                    constraints:
+                                        const BoxConstraints.expand(height: 20),
                                   ),
-                              ],
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -488,7 +497,6 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
             } else {
               return ListView(
                 shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   for (var item in widget.items)
                     ListTile(
@@ -626,7 +634,12 @@ class _HomeHeaderContentItemState extends State<HomeHeaderContentItem> {
 
 // Main Widget
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({
+    super.key,
+    required this.size,
+  });
+
+  final Size size;
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
@@ -705,9 +718,10 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
       ),
       menuChild: HomeHeaderMenuContent(
         items: mainMenuContent,
-        // TODO: Move Header Menu to LisTile
+        // TODO: Move Header Menu Items to LisTile
         leadingItems: const [],
         trailingItems: const [],
+        size: widget.size,
       ),
     ),
   ];
@@ -797,6 +811,7 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
                     animation: _contentAnimation,
                     activeContent: activeContent,
                     contents: _allItems,
+                    size: widget.size,
                   ),
                 ),
               ],

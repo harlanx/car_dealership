@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:sliver_tools/sliver_tools.dart';
 
 import 'content/home_pinned_extra.dart';
@@ -12,18 +11,34 @@ import 'content/home_copyright_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
-  final ScrollController _scrollController = ScrollController();
+  final _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: CustomScrollView(
         controller: _scrollController,
         shrinkWrap: true,
         slivers: [
-          const HomePinnedExtra(),
+          const HomePinnedExtra(), // SliverAppbar
+          // The body is affacted when header is expanded
+          // PinnedHeaderSliver(child: HomeHeader(size: size)),
+          // SliverToBoxAdapter(
+          //   child: Column(
+          //     mainAxisSize: MainAxisSize.min,
+          //     children: [
+          //       HomeHighlight(size: size),
+          //       HomeLineup(size: size),
+          //       HomeNews(size: size),
+          //       HomeBottomInfo(size: size),
+          //       HomeCopyrightBar(size: size),
+          //     ],
+          //   ),
+          // ),
+          // The body is not affect when header is expanded
           SliverStack(
-            insetOnOverlap: true,
+            insetOnOverlap: false,
             children: [
               SliverToBoxAdapter(
                 child: Padding(
@@ -31,16 +46,16 @@ class HomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      HomeHighlight(size: MediaQuery.of(context).size),
-                      HomeLineup(size: MediaQuery.of(context).size),
-                      HomeNews(size: MediaQuery.of(context).size),
-                      HomeBottomInfo(size: MediaQuery.of(context).size),
-                      HomeCopyrightBar(size: MediaQuery.of(context).size),
+                      HomeHighlight(size: size),
+                      HomeLineup(size: size),
+                      HomeNews(size: size),
+                      HomeBottomInfo(size: size),
+                      HomeCopyrightBar(size: size),
                     ],
                   ),
                 ),
               ),
-              const SliverPinnedHeader(child: HomeHeader()),
+              SliverPinnedHeader(child: HomeHeader(size: size)),
             ],
           ),
         ],
