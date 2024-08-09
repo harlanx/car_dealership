@@ -266,7 +266,6 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    final screenSmall = widget.size.width <= 600;
     return ValueListenableBuilder(
       valueListenable: widget.activeContent,
       builder: (context, value, child) {
@@ -298,24 +297,34 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
           );
         }
 
-        return Container(
-          height: isMainMenu && screenSmall ? widget.size.height - 78 : null,
-          alignment: Alignment.topLeft,
-          decoration: const BoxDecoration(
-            color: Colors.black,
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.white,
-                width: 2.0,
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            // 650 + 50*2 for each side of horizontal padding of MainMenuContent
+            final screenSmall = constraints.maxWidth <= 750;
+            return Container(
+              alignment: Alignment.topLeft,
+              decoration: const BoxDecoration(
+                color: Colors.black,
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white,
+                    width: 2.0,
+                  ),
+                ),
               ),
-            ),
-          ),
-          child: AnimatedSize(
-            duration: widget.controller.duration!,
-            curve: widget.animation.curve,
-            alignment: Alignment.topLeft,
-            child: result,
-          ),
+              child: AnimatedSize(
+                duration: widget.controller.duration!,
+                curve: widget.animation.curve,
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  height: isMainMenu && screenSmall
+                      ? widget.size.height - 78
+                      : null,
+                  child: result,
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -328,13 +337,11 @@ class HomeHeaderMenuContent extends StatefulWidget {
     required this.items,
     required this.leadingItems,
     required this.trailingItems,
-    required this.size,
   });
 
   final List<String> items;
   final List<MenuItem> leadingItems;
   final List<MenuItem> trailingItems;
-  final Size size;
 
   @override
   State<HomeHeaderMenuContent> createState() => _HomeHeaderMenuContentState();
@@ -360,9 +367,11 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
         ),
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final screenLarge = 650 <= constraints.maxWidth;
-            if (screenLarge) {
-              return Column(
+            final screenSmall = constraints.maxWidth <= 650;
+            Widget child;
+            if (!screenSmall) {
+              child = Column(
+                key: const ValueKey('MenuItemContent'),
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -495,7 +504,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
                 ],
               );
             } else {
-              return ListView(
+              child = ListView(
                 shrinkWrap: true,
                 children: [
                   for (var item in widget.items)
@@ -516,6 +525,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
                 ],
               );
             }
+            return child;
           },
         ),
       ),
@@ -721,7 +731,6 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
         // TODO: Move Header Menu Items to LisTile
         leadingItems: const [],
         trailingItems: const [],
-        size: widget.size,
       ),
     ),
   ];
