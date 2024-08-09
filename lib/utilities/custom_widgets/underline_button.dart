@@ -25,6 +25,13 @@ class _UnderlineButtonState extends State<UnderlineButton>
   );
 
   @override
+  void dispose() {
+    _controller.dispose();
+    _animation.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final style = DefaultTextStyle.of(context).style;
     final textSize = widget.text.textSize(
