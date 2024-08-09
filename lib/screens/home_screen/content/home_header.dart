@@ -350,10 +350,7 @@ class HomeHeaderMenuContent extends StatefulWidget {
 class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
   @override
   Widget build(BuildContext context) {
-    final chunks = widget.items.slices(4);
-    final itemList = chunks.map((e) => e.map((e) => e).toList()).toList();
-    itemList[itemList.length - 2].addAll([...itemList.last]);
-    itemList.removeLast();
+    final itemList = widget.items.divide(3, reverse: true).toList();
 
     return Container(
       width: double.infinity,
@@ -505,6 +502,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
               );
             } else {
               child = ListView(
+                key: const ValueKey('MenuItemContent'),
                 shrinkWrap: true,
                 children: [
                   for (var item in widget.items)

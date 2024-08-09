@@ -117,3 +117,41 @@ extension BuildContextEx on BuildContext {
     }
   }
 }
+
+extension ListEx<E> on List<E> {
+  void swap(int first, int second) {
+    final temp = this[first];
+    this[first] = this[second];
+    this[second] = temp;
+  }
+
+  Iterable<List<E>> divide(int count, {bool reverse = false}) {
+    assert(count > 0, throw ArgumentError('Count must be greater than 0'));
+
+    final baseSize = length ~/ count;
+    final extra = length % count;
+
+    final List<List<E>> result = [];
+    int resultIndex = 0;
+
+    for (int i = 0; i < count; i++) {
+      final size = baseSize + (i < extra ? 1 : 0);
+      result.add(sublist(resultIndex, resultIndex + size));
+      resultIndex += size;
+    }
+
+    if (reverse && extra > 0) {
+      int reverseIndex = 0;
+      final List<E> allItems = result.expand((e) => e).toList();
+      result.swap(0, result.length - 1);
+      for (var sublist in result) {
+        for (int i = 0; i < sublist.length; i++) {
+          sublist[i] = allItems[reverseIndex];
+          reverseIndex++;
+        }
+      }
+    }
+
+    return result;
+  }
+}
