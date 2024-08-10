@@ -274,12 +274,9 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
         final isMainMenu = value == 'Menu';
         Widget result;
         if (isMainMenu) {
-          result = KeyedSubtree(
-            key: ValueKey(value),
-            child: menu!.menuChild!,
-          );
+          result = menu!.menuChild!;
         } else if (value.isEmpty || menu?.content == null) {
-          result = SizedBox(key: ValueKey(value));
+          result = const SizedBox();
         } else {
           final labelPos = menu?.context?.globalPaintBounds;
 
@@ -292,7 +289,6 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
           // Aligned to the label
           result = Padding(
             padding: EdgeInsets.only(left: labelPos?.left ?? 0.0),
-            key: ValueKey(value),
             child: HomeHeaderContentItem(items: menu!.content!),
           );
         }
@@ -300,7 +296,8 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
         return LayoutBuilder(
           builder: (context, constraints) {
             // 650 + 50*2 for each side of horizontal padding of MainMenuContent
-            final screenSmall = constraints.maxWidth <= 750;
+            final widthSmall = constraints.maxWidth <= 750;
+            final heightSmall = widget.size.height <= 500;
             return Container(
               alignment: Alignment.topLeft,
               decoration: const BoxDecoration(
@@ -317,10 +314,18 @@ class _HomeHeaderContentBoxState extends State<HomeHeaderContentBox>
                 curve: widget.animation.curve,
                 alignment: Alignment.topLeft,
                 child: SizedBox(
-                  height: isMainMenu && screenSmall
+                  height: isMainMenu && (widthSmall || heightSmall)
                       ? widget.size.height - 78
                       : null,
-                  child: result,
+                  child: !heightSmall
+                      ? KeyedSubtree(
+                          key: ValueKey(value),
+                          child: result,
+                        )
+                      : SingleChildScrollView(
+                          key: ValueKey(value),
+                          child: result,
+                        ),
                 ),
               ),
             );
