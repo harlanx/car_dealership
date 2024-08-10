@@ -9,14 +9,19 @@ class MenuItem {
     required this.label,
     this.content,
     this.menuChild,
-    required this.controller,
+    required this.vsync,
+    this.duration = const Duration(milliseconds: 300),
     this.context,
-  });
+  }) {
+    controller = AnimationController(vsync: vsync, duration: duration);
+  }
 
   final String label;
   final List<MenuContentItem>? content;
   final Widget? menuChild;
-  final AnimationController controller;
+  final TickerProvider vsync;
+  late final AnimationController controller;
+  final Duration duration;
   BuildContext? context;
 
   bool get hasContent => content != null;

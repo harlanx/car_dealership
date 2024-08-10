@@ -141,14 +141,14 @@ class LeadingMenus extends StatefulWidget {
     required this.activeContent,
     required this.items,
     required this.allItems,
-    required this.showMenus,
+    required this.hideMenu,
   });
 
   final AnimationController controller;
   final ValueNotifier<String> activeContent;
   final List<MenuItem> items;
   final List<MenuItem> allItems;
-  final bool showMenus;
+  final bool hideMenu;
 
   @override
   State<LeadingMenus> createState() => LeadingMenusState();
@@ -181,7 +181,7 @@ class LeadingMenusState extends State<LeadingMenus> {
           Flexible(
             key: ValueKey(item.label),
             child: Offstage(
-              offstage: !widget.showMenus,
+              offstage: widget.hideMenu,
               child: HomeHeaderMenu(
                 label: item.label,
                 items: widget.allItems,
@@ -201,14 +201,14 @@ class TrailingMenus extends StatefulWidget {
     required this.activeContent,
     required this.items,
     required this.allItems,
-    required this.showMenus,
+    required this.hideMenu,
   });
 
   final AnimationController controller;
   final ValueNotifier<String> activeContent;
   final List<MenuItem> items;
   final List<MenuItem> allItems;
-  final bool showMenus;
+  final bool hideMenu;
 
   @override
   State<TrailingMenus> createState() => _TrailingMenusState();
@@ -221,7 +221,7 @@ class _TrailingMenusState extends State<TrailingMenus> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (!widget.showMenus) ...[
+        if (widget.hideMenu) ...[
           IconButton(onPressed: () {}, icon: const Icon(Icons.message_rounded)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.search_outlined)),
         ],
@@ -229,7 +229,7 @@ class _TrailingMenusState extends State<TrailingMenus> {
           Flexible(
             key: ValueKey(item.label),
             child: Offstage(
-              offstage: !widget.showMenus && item.label != 'Menu',
+              offstage: widget.hideMenu && item.label != 'Menu',
               child: HomeHeaderMenu(
                 label: item.label,
                 items: widget.allItems,
@@ -342,21 +342,58 @@ class HomeHeaderMenuContent extends StatefulWidget {
     required this.items,
     required this.leadingItems,
     required this.trailingItems,
+    required this.hideLeading,
+    required this.hideTrailing,
   });
 
   final List<String> items;
   final List<MenuItem> leadingItems;
   final List<MenuItem> trailingItems;
+  final ValueNotifier<bool> hideLeading;
+  final ValueNotifier<bool> hideTrailing;
 
   @override
   State<HomeHeaderMenuContent> createState() => _HomeHeaderMenuContentState();
 }
 
 class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
+  late final itemList = _allItems.divide(3, reverse: true).toList();
+
+  List<String> get _allItems {
+    final result = <String>[];
+    result.addAll(
+      [
+        if (widget.hideLeading.value)
+          ...widget.leadingItems.map((e) => e.label),
+        if (widget.hideTrailing.value)
+          ...widget.trailingItems.map((e) => e.label),
+        ...widget.items,
+      ],
+    );
+    return result;
+  }
+
+  void updateItems() {
+    itemList.clear();
+    itemList.addAll(_allItems.divide(3, reverse: true).toList());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.hideLeading.addListener(updateItems);
+    widget.hideTrailing.addListener(updateItems);
+  }
+
+  @override
+  void dispose() {
+    widget.hideLeading.removeListener(updateItems);
+    widget.hideTrailing.removeListener(updateItems);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final itemList = widget.items.divide(3, reverse: true).toList();
-
     return Container(
       width: double.infinity,
       alignment: Alignment.topCenter,
@@ -510,7 +547,7 @@ class _HomeHeaderMenuContentState extends State<HomeHeaderMenuContent> {
                 key: const ValueKey('MenuItemContent'),
                 shrinkWrap: true,
                 children: [
-                  for (var item in widget.items)
+                  for (var item in _allItems)
                     ListTile(
                       onTap: () {},
                       title: Text(
@@ -662,78 +699,71 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
   late final _leadingItems = <MenuItem>[
     MenuItem(
       label: 'Models',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
       content: modelsContent,
     ),
     MenuItem(
       label: 'Dealers',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
       content: dealersContent,
     ),
     MenuItem(
       label: 'Services',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
       content: servicesContent,
     ),
     MenuItem(
       label: 'Careers',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
       content: carrersContent,
+    ),
+  ];
+
+  late final _unusedTrailingItems = <MenuItem>[
+    MenuItem(
+      label: 'Store',
+      vsync: this,
+    ),
+    MenuItem(
+      label: 'FAQ',
+      vsync: this,
+    ),
+    MenuItem(
+      label: 'About Us',
+      vsync: this,
+    ),
+    MenuItem(
+      label: 'Contact Us',
+      vsync: this,
     ),
   ];
 
   late final _trailingItems = <MenuItem>[
     MenuItem(
       label: 'Store',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
     ),
     MenuItem(
       label: 'FAQ',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
     ),
     MenuItem(
       label: 'About Us',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
     ),
     MenuItem(
       label: 'Contact Us',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
     ),
     MenuItem(
       label: 'Menu',
-      controller: AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 300),
-      ),
+      vsync: this,
       menuChild: HomeHeaderMenuContent(
         items: mainMenuContent,
-        // TODO: Move Header Menu Items to LisTile
-        leadingItems: const [],
-        trailingItems: const [],
+        leadingItems: _leadingItems,
+        trailingItems: _unusedTrailingItems,
+        hideLeading: hideLeading,
+        hideTrailing: hideTrailing,
       ),
     ),
   ];
@@ -754,6 +784,8 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
   ];
 
   final activeContent = ValueNotifier<String>('');
+  final hideLeading = ValueNotifier<bool>(false);
+  final hideTrailing = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -778,56 +810,54 @@ class _HomeHeaderState extends State<HomeHeader> with TickerProviderStateMixin {
         child: AnimatedBuilder(
           animation: _contentAnimation,
           builder: (context, child) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  height: 80,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  color: Colors.black,
-                  child: DefaultTextStyle.merge(
-                    style: const TextStyle(color: Colors.white),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final showLeading = constraints.maxWidth > 1000;
-                        final showTrailing = constraints.maxWidth > 600;
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            LeadingMenus(
-                              controller: _contentController,
-                              items: _leadingItems,
-                              allItems: _allItems,
-                              activeContent: activeContent,
-                              showMenus: showLeading,
-                            ),
-                            TrailingMenus(
-                              controller: _contentController,
-                              items: _trailingItems,
-                              allItems: _allItems,
-                              activeContent: activeContent,
-                              showMenus: showTrailing,
-                            ),
-                          ],
-                        );
-                      },
+            return LayoutBuilder(builder: (context, constraints) {
+              hideLeading.value = constraints.maxWidth <= 1000;
+              hideTrailing.value = constraints.maxWidth <= 650;
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    height: 80,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    color: Colors.black,
+                    child: DefaultTextStyle.merge(
+                      style: const TextStyle(color: Colors.white),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          LeadingMenus(
+                            controller: _contentController,
+                            items: _leadingItems,
+                            allItems: _allItems,
+                            activeContent: activeContent,
+                            hideMenu: hideLeading.value,
+                          ),
+                          TrailingMenus(
+                            controller: _contentController,
+                            items: _trailingItems,
+                            allItems: _allItems,
+                            activeContent: activeContent,
+                            hideMenu: hideTrailing.value,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                Flexible(
-                  child: HomeHeaderContentBox(
-                    controller: _contentController,
-                    animation: _contentAnimation,
-                    activeContent: activeContent,
-                    contents: _allItems,
-                    size: widget.size,
+                  Flexible(
+                    child: HomeHeaderContentBox(
+                      controller: _contentController,
+                      animation: _contentAnimation,
+                      activeContent: activeContent,
+                      contents: _allItems,
+                      size: widget.size,
+                    ),
                   ),
-                ),
-              ],
-            );
+                ],
+              );
+            });
           },
         ),
       ),
