@@ -1,11 +1,11 @@
 {
-    "name": "car_dealership",
-    "short_name": "car_dealership",
+    "name": "Silvian Automobile PH",
+    "short_name": "Silvian",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#C22610",
+    "theme_color": "#C22610",
+    "description": "Silvian Automobile PH.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
